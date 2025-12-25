@@ -4,7 +4,6 @@ export const translations = {
   ar: {
     // Navigation
     home: "الرئيسية",
-    properties: "الغرف",
     booking: "الحجز",
     about: "من نحن",
     contact: "اتصل بنا",
@@ -48,11 +47,31 @@ export const translations = {
     soldOut: "محجوز",
     soldOutMessage: "هل تواريخك مرنة؟",
     close: "إغلاق",
+    
+    // Rooms Page
+    roomsTitle: "غرفنا الفاخرة",
+    roomsSubtitle: "اختر الإقامة المثالية لرحلتك",
+    perNight: "للليلة",
+    viewDetails: "عرض التفاصيل",
+    roomType1: "غرفة ديلوكس",
+    roomType1Desc: "غرفة واسعة ومريحة مع إطلالة رائعة على المدينة",
+    roomType2: "جناح فاخر",
+    roomType2Desc: "جناح أنيق مع غرفة معيشة منفصلة ومطبخ صغير",
+    roomType3: "جناح رئاسي",
+    roomType3Desc: "جناح واسع مع شرفة خاصة وإطلالة بانورامية",
+    roomType4: "غرفة عائلية",
+    roomType4Desc: "غرفة واسعة مناسبة للعائلات مع منطقة جلوس إضافية",
+    roomType5: "جناح هنيئة",
+    roomType5Desc: "جناح فاخر مع جاكوزي خاص ومنطقة استرخاء",
+    roomFeatures: "المميزات",
+    roomSize: "المساحة",
+    roomGuests: "الضيوف",
+    roomBeds: "الأسرّة",
+    squareMeters: "متر مربع",
   },
   en: {
     // Navigation
     home: "Home",
-    properties: "Rooms",
     booking: "Booking",
     about: "About",
     contact: "Contact",
@@ -96,6 +115,27 @@ export const translations = {
     soldOut: "SOLD OUT",
     soldOutMessage: "ARE YOUR DATES FLEXIBLE?",
     close: "Close",
+    
+    // Rooms Page
+    roomsTitle: "Our Luxury Rooms",
+    roomsSubtitle: "Choose the perfect accommodation for your stay",
+    perNight: "per night",
+    viewDetails: "View Details",
+    roomType1: "Deluxe Room",
+    roomType1Desc: "Spacious and comfortable room with stunning city views",
+    roomType2: "Luxury Suite",
+    roomType2Desc: "Elegant suite with separate living area and mini kitchen",
+    roomType3: "Presidential Suite",
+    roomType3Desc: "Spacious suite with private balcony and panoramic views",
+    roomType4: "Family Room",
+    roomType4Desc: "Large room perfect for families with extra seating area",
+    roomType5: "Honeymoon Suite",
+    roomType5Desc: "Luxurious suite with private jacuzzi and relaxation area",
+    roomFeatures: "Features",
+    roomSize: "Size",
+    roomGuests: "Guests",
+    roomBeds: "Beds",
+    squareMeters: "sqm",
   },
 };
 

@@ -35,10 +35,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/properties"
+                  href="/rooms"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  {t("properties")}
+                  {t("rooms")}
                 </Link>
               </li>
               <li>

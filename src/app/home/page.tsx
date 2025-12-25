@@ -24,7 +24,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/properties"
+                href="/rooms"
                 className="bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 rounded-sm font-semibold hover:bg-white/20 transition-all text-lg"
               >
                 {t("exploreRooms")}

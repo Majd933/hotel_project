@@ -136,7 +136,7 @@ export default function Header() {
                     {t("home")}
                   </Link>
                   <Link
-                    href="/properties"
+                    href="/rooms"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
                       isScrolled 
@@ -144,7 +144,7 @@ export default function Header() {
                         : "text-white hover:bg-white/20"
                     }`}
                   >
-                    {t("properties")}
+                    {t("rooms")}
                   </Link>
                   <Link
                     href="/booking"
@@ -231,7 +231,7 @@ export default function Header() {
                         {t("home")}
                       </Link>
                       <Link
-                        href="/properties"
+                        href="/rooms"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
                           isScrolled 
@@ -239,7 +239,7 @@ export default function Header() {
                             : "text-white hover:bg-white/20"
                         }`}
                       >
-                        {t("properties")}
+                        {t("rooms")}
                       </Link>
                       <Link
                         href="/booking"

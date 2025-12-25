@@ -75,7 +75,7 @@ export default function BookingPage() {
                 {language === "ar" ? "هل لديك..." : "Do you have a..."}
               </button>
               <Link
-                href="/properties"
+                href="/rooms"
                 className="bg-stone-800 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-stone-700 transition-colors whitespace-nowrap"
               >
                 {t("exploreOptions")}
