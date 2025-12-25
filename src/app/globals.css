@@ -22,7 +22,7 @@
 
 /* النصوص الإنجليزية */
 body {
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: var(--font-ibm-plex), sans-serif;
 }

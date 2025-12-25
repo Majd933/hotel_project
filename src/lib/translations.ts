@@ -11,7 +11,7 @@ export const translations = {
     hotelName: "فندق الشيراتون",
     
     // Home Page
-    welcomeTitle: "مرحباً بك في فندق الشيراتون",
+    welcomeTitle: "حيث تلتقي الأناقة بالتراث الأصيل",
     welcomeSubtitle: "استمتع بإقامة فاخرة وخدمة استثنائية",
     exploreRooms: "استكشف الغرف",
     bookNow: "احجز الآن",
@@ -33,6 +33,21 @@ export const translations = {
     followUs: "تابعنا",
     address: "العنوان، المدينة",
     allRightsReserved: "جميع الحقوق محفوظة",
+    
+    // Booking Page
+    selectDates: "اختر التواريخ",
+    room: "غرفة",
+    rooms: "غرف",
+    adult: "بالغ",
+    adults: "بالغين",
+    exploreOptions: "استكشف الخيارات",
+    localCurrency: "العملة المحلية",
+    available: "متاح",
+    selectedDates: "التواريخ المحددة",
+    restrictionsApply: "توجد قيود",
+    soldOut: "محجوز",
+    soldOutMessage: "هل تواريخك مرنة؟",
+    close: "إغلاق",
   },
   en: {
     // Navigation
@@ -44,8 +59,8 @@ export const translations = {
     hotelName: "Sheraton Hotel",
     
     // Home Page
-    welcomeTitle: "Welcome to Sheraton Hotel",
-    welcomeSubtitle: "Enjoy a luxurious stay and exceptional service",
+    welcomeTitle: "Where Elegance Meets Authentic Heritage",
+    welcomeSubtitle: "Unlimited Luxury, Unmatched Comfort",
     exploreRooms: "Explore Rooms",
     bookNow: "Book Now",
     ourFeatures: "Our Features",
@@ -66,6 +81,21 @@ export const translations = {
     followUs: "Follow Us",
     address: "Address, City",
     allRightsReserved: "All rights reserved",
+    
+    // Booking Page
+    selectDates: "Select dates",
+    room: "Room",
+    rooms: "Rooms",
+    adult: "Adult",
+    adults: "Adults",
+    exploreOptions: "EXPLORE OPTIONS",
+    localCurrency: "Local currency",
+    available: "AVAILABLE",
+    selectedDates: "SELECTED DATES",
+    restrictionsApply: "RESTRICTIONS APPLY",
+    soldOut: "SOLD OUT",
+    soldOutMessage: "ARE YOUR DATES FLEXIBLE?",
+    close: "Close",
   },
 };
 

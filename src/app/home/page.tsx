@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
+import HeroWithHeader from "@/components/HeroWithHeader";
 
 export default function HomePage() {
   const { language } = useLanguage();
@@ -12,50 +12,33 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[600px] md:h-[700px] overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <Image
-            src="/images/home.jpg"
-            alt="Luxury resort pool"
-            fill
-            className="object-cover"
-            priority
-            quality={90}
-          />
-          {/* Overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/40"></div>
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 h-full flex items-center">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center text-white">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 font-playfair">
-                {t("welcomeTitle")}
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 opacity-90">
-                {t("welcomeSubtitle")}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/properties"
-                  className="bg-stone-800 text-stone-50 px-8 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors"
-                >
-                  {t("exploreRooms")}
-                </Link>
-                <Link
-                  href="/booking"
-                  className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-stone-800 transition-colors"
-                >
-                  {t("bookNow")}
-                </Link>
-              </div>
+      {/* Hero Section with Header and Background Image */}
+      <HeroWithHeader>
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center text-white">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-4 font-playfair leading-tight">
+              {t("welcomeTitle")}
+            </h1>
+            <p className="text-2xl md:text-3xl mb-12 opacity-95 font-light">
+              {t("welcomeSubtitle")}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/properties"
+                className="bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 rounded-sm font-semibold hover:bg-white/20 transition-all text-lg"
+              >
+                {t("exploreRooms")}
+              </Link>
+              <Link
+                href="/booking"
+                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-sm font-semibold hover:bg-white hover:text-stone-800 transition-all text-lg"
+              >
+                {t("bookNow")}
+              </Link>
             </div>
           </div>
         </div>
-      </section>
+      </HeroWithHeader>
 
       {/* Features Section */}
       <section className="py-16 bg-gray-50">

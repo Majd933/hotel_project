@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Cairo, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
+import ConditionalHeader from "@/components/ConditionalHeader";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -42,8 +42,8 @@ export default function RootLayout({
         className={`${playfairDisplay.variable} ${cairo.variable} ${ibmPlexSans.variable} antialiased flex flex-col min-h-screen`}
       >
         <LanguageProvider>
-          <Header />
-          <div className="flex-grow">
+          <ConditionalHeader />
+          <div className="flex-grow relative" style={{ marginTop: 0, paddingTop: 0 }}>
             {children}
           </div>
           <Footer />
