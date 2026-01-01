@@ -56,23 +56,6 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
     ? ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"]
     : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Mock prices - in real app, this would come from an API
-  const getPrice = (date: Date | null) => {
-    if (!date) return null;
-    // Generate consistent prices based on date
-    // Show prices for dates starting from the 24th of the current month onwards
-    const today = new Date();
-    const daysDifference = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    
-    // Show prices for dates 14+ days in the future
-    if (daysDifference < 14) return null;
-    
-    // Generate prices between 343-802 for demonstration (similar to the reference image)
-    const seed = date.getTime();
-    const price = 343 + (seed % 460);
-    return price;
-  };
-
   const isSelected = (date: Date | null) => {
     if (!date) return false;
     return selectedDates.some(
@@ -119,7 +102,6 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
           ))}
           
           {days1.map((date, index) => {
-            const price = getPrice(date);
             const selected = isSelected(date);
             const past = isPastDate(date);
             
@@ -128,21 +110,14 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  relative min-h-[80px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
+                  relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past ? "text-stone-300 cursor-not-allowed" : "text-stone-800 hover:bg-stone-100"}
                   ${selected ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
               >
                 {date && (
-                  <>
-                    <div className="text-base font-medium mb-1">{date.getDate()}</div>
-                    {price && !past && (
-                      <div className="text-xs font-normal">
-                        {language === "ar" ? `${price} ر.س` : `EUR ${price}`}
-                      </div>
-                    )}
-                  </>
+                  <div className="text-base font-medium">{date.getDate()}</div>
                 )}
               </div>
             );
@@ -166,7 +141,6 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
           ))}
           
           {days2.map((date, index) => {
-            const price = getPrice(date);
             const selected = isSelected(date);
             const past = isPastDate(date);
             
@@ -175,21 +149,14 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  relative min-h-[80px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
+                  relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past ? "text-stone-300 cursor-not-allowed" : "text-stone-800 hover:bg-stone-100"}
                   ${selected ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
               >
                 {date && (
-                  <>
-                    <div className="text-base font-medium mb-1">{date.getDate()}</div>
-                    {price && !past && (
-                      <div className="text-xs font-normal">
-                        {language === "ar" ? `${price} ر.س` : `EUR ${price}`}
-                      </div>
-                    )}
-                  </>
+                  <div className="text-base font-medium">{date.getDate()}</div>
                 )}
               </div>
             );
