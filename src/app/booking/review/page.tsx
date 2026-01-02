@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
@@ -37,7 +37,7 @@ const exchangeRates: Record<Currency, number> = {
   SYP: 13000,
 };
 
-export default function ReviewPage() {
+function ReviewPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { language } = useLanguage();
@@ -302,6 +302,18 @@ export default function ReviewPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-xl text-stone-600">Loading...</div>
+      </div>
+    }>
+      <ReviewPageContent />
+    </Suspense>
   );
 }
 

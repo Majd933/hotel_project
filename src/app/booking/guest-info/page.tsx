@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
@@ -27,7 +27,7 @@ interface Room {
   features: string[];
 }
 
-export default function GuestInfoPage() {
+function GuestInfoPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { language, toggleLanguage } = useLanguage();
@@ -402,5 +402,17 @@ export default function GuestInfoPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GuestInfoPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-xl text-stone-600">Loading...</div>
+      </div>
+    }>
+      <GuestInfoPageContent />
+    </Suspense>
   );
 }

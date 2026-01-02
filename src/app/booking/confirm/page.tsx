@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
 import BookingTimeline from "@/components/BookingTimeline";
@@ -20,7 +21,7 @@ interface Room {
   features: string[];
 }
 
-export default function ConfirmBookingPage() {
+function ConfirmBookingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { language } = useLanguage();
@@ -108,5 +109,17 @@ export default function ConfirmBookingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ConfirmBookingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-xl text-stone-600">Loading...</div>
+      </div>
+    }>
+      <ConfirmBookingContent />
+    </Suspense>
   );
 }
