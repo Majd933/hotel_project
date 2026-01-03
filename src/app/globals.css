@@ -44,3 +44,17 @@ body[dir="rtl"] {
 .font-ibm-plex {
   font-family: var(--font-ibm-plex), sans-serif;
 }
+
+/* Animated Arc */
+@keyframes floatArc {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.arc-container {
+  animation: floatArc 3s ease-in-out infinite;
+}

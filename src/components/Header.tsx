@@ -67,7 +67,7 @@ export default function Header() {
           </div>
 
           {/* Logo - Center */}
-          <Link href="/home" className={`text-2xl font-bold font-playfair transition-colors ${
+          <Link href="/home" className={`text-4xl font-bold font-playfair transition-colors ${
             isScrolled ? "text-stone-800" : "text-white"
           }`}>
             {t("hotelName")}

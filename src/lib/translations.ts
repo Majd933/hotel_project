@@ -24,6 +24,7 @@ export const translations = {
     bookYourStay: "احجز إقامتك الآن",
     bookYourStayDesc: "استمتع بعروض خاصة وخدمة استثنائية",
     startBooking: "ابدأ الحجز",
+    clickForMore: "انقر للمزيد",
     
     // Footer
     footerDescription: "استمتع بإقامة فاخرة وخدمة استثنائية في قلب المدينة",
@@ -133,6 +134,7 @@ export const translations = {
     bookYourStay: "Book Your Stay Now",
     bookYourStayDesc: "Enjoy special offers and exceptional service",
     startBooking: "Start Booking",
+    clickForMore: "Click for more",
     
     // Footer
     footerDescription: "Enjoy a luxurious stay and exceptional service in the heart of the city",
