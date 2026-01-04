@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { getTranslation } from "@/lib/translations";
+import { getTranslation, getFeatureTranslation } from "@/lib/translations";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -181,7 +181,7 @@ export default function RoomsPage() {
                   {/* Right: Room Details */}
                   <div className={`${language === "ar" ? "order-1 lg:order-2 text-right" : "order-2 text-left"} space-y-6`}>
                     <div>
-                      <h2 className={`text-4xl font-bold text-stone-800 mb-4 font-playfair ${language === "ar" ? "font-cairo" : ""}`}>
+                      <h2 className={`text-4xl font-bold text-stone-800 mb-4 ${language === "ar" ? "font-cairo" : "font-playfair"}`}>
                         {t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                       </h2>
                       <p className={`text-lg text-stone-600 mb-6 font-light ${language === "ar" ? "font-cairo" : ""}`}>
@@ -190,17 +190,18 @@ export default function RoomsPage() {
                     </div>
 
                     {/* Room Specifications */}
-                    <div className={`flex ${language === "ar" ? "flex-row-reverse justify-end" : "justify-start"} gap-6 pb-6 border-b border-stone-200`}>
+                    <div className={`flex ${language === "ar" ? "flex-row-reverse justify-end" : "justify-start"} items-center gap-8 pb-6 border-b border-stone-200`}>
                       <div>
-                        <div className={`text-2xl font-light text-stone-800 ${language === "ar" ? "font-cairo" : "font-playfair"}`}>
+                        <div className={`text-2xl font-light text-stone-800 ${language === "ar" ? "font-cairo" : ""}`}>
                           {room.size} {t("squareMeters")}
                         </div>
                         <div className={`text-sm text-stone-600 ${language === "ar" ? "font-cairo" : ""}`}>
                           {t("roomSize")}
                         </div>
                       </div>
-                      <div className={`${language === "ar" ? "border-r" : "border-l"} border-stone-300 px-6`}>
-                        <div className={`text-2xl font-light text-stone-800 ${language === "ar" ? "font-cairo" : "font-playfair"}`}>
+                      <div className={`h-12 ${language === "ar" ? "border-r" : "border-l"} border-stone-300`}></div>
+                      <div>
+                        <div className={`text-2xl font-light text-stone-800 ${language === "ar" ? "font-cairo" : ""}`}>
                           {room.guests}
                         </div>
                         <div className={`text-sm text-stone-600 ${language === "ar" ? "font-cairo" : ""}`}>
@@ -211,16 +212,16 @@ export default function RoomsPage() {
 
                     {/* Features */}
                     <div>
-                      <h3 className={`text-xl font-light text-stone-800 mb-4 ${language === "ar" ? "font-cairo" : "font-playfair"}`}>
+                      <h3 className={`text-xl font-light text-stone-800 mb-4 ${language === "ar" ? "font-cairo" : ""}`}>
                         {t("roomFeatures")}
                       </h3>
                       <div className={`flex flex-wrap gap-3 ${language === "ar" ? "flex-row-reverse justify-end" : "justify-start"}`}>
                         {room.features.map((feature, featureIndex) => (
                           <span
                             key={featureIndex}
-                            className="bg-stone-100 text-stone-700 px-4 py-2 rounded-lg text-sm"
+                            className={`bg-stone-100 text-stone-700 px-4 py-2 rounded-lg text-sm ${language === "ar" ? "font-cairo" : ""}`}
                           >
-                            {feature}
+                            {getFeatureTranslation(feature, language)}
                           </span>
                         ))}
                       </div>

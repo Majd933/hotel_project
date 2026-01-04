@@ -95,7 +95,7 @@ export const translations = {
     roomsSubtitle: "اختر الإقامة المثالية لرحلتك",
     perNight: "للليلة",
     viewDetails: "عرض التفاصيل",
-    roomType1: "غرفة ديلوكس",
+    roomType1: "غرفة فاخرة",
     roomType1Desc: "غرفة واسعة ومريحة مع إطلالة رائعة على المدينة",
     roomType2: "جناح فاخر",
     roomType2Desc: "جناح أنيق مع غرفة معيشة منفصلة ومطبخ صغير",
@@ -103,13 +103,31 @@ export const translations = {
     roomType3Desc: "جناح واسع مع شرفة خاصة وإطلالة بانورامية",
     roomType4: "غرفة عائلية",
     roomType4Desc: "غرفة واسعة مناسبة للعائلات مع منطقة جلوس إضافية",
-    roomType5: "جناح هنيئة",
+    roomType5: "جناح شهر العسل",
     roomType5Desc: "جناح فاخر مع جاكوزي خاص ومنطقة استرخاء",
     roomFeatures: "المميزات",
     roomSize: "المساحة",
     roomGuests: "الضيوف",
     roomBeds: "الأسرّة",
     squareMeters: "متر مربع",
+    
+    // Room Features
+    featureWiFi: "واي فاي",
+    featureTV: "تلفزيون",
+    featureMinibar: "ميني بار",
+    featureAC: "تكييف",
+    featureSeaView: "إطلالة بحرية",
+    featureBalcony: "شرفة",
+    featureKitchen: "مطبخ",
+    featureLivingRoom: "غرفة معيشة",
+    featureJacuzzi: "جاكوزي",
+    featureDiningArea: "منطقة طعام",
+    featurePrivatePool: "مسبح خاص",
+    featureExtraBeds: "أسرّة إضافية",
+    featureSeatingArea: "منطقة جلوس",
+    featureFamilyFriendly: "مناسب للعائلات",
+    featureRomanticSetup: "إعداد رومانسي",
+    featurePrivateTerrace: "تراس خاص",
   },
   en: {
     // Navigation
@@ -220,10 +238,56 @@ export const translations = {
     roomGuests: "Guests",
     roomBeds: "Beds",
     squareMeters: "sqm",
+    
+    // Room Features
+    featureWiFi: "Wi-Fi",
+    featureTV: "TV",
+    featureMinibar: "Minibar",
+    featureAC: "AC",
+    featureSeaView: "Sea View",
+    featureBalcony: "Balcony",
+    featureKitchen: "Kitchen",
+    featureLivingRoom: "Living Room",
+    featureJacuzzi: "Jacuzzi",
+    featureDiningArea: "Dining Area",
+    featurePrivatePool: "Private Pool",
+    featureExtraBeds: "Extra Beds",
+    featureSeatingArea: "Seating Area",
+    featureFamilyFriendly: "Family Friendly",
+    featureRomanticSetup: "Romantic Setup",
+    featurePrivateTerrace: "Private Terrace",
   },
 };
 
 export const getTranslation = (lang: Language, key: keyof typeof translations.ar) => {
   return translations[lang][key];
+};
+
+// Feature translation mapping
+export const getFeatureTranslation = (feature: string, lang: Language): string => {
+  const featureMap: Record<string, keyof typeof translations.ar> = {
+    "Wi-Fi": "featureWiFi",
+    "TV": "featureTV",
+    "Minibar": "featureMinibar",
+    "AC": "featureAC",
+    "Sea View": "featureSeaView",
+    "Balcony": "featureBalcony",
+    "Kitchen": "featureKitchen",
+    "Living Room": "featureLivingRoom",
+    "Jacuzzi": "featureJacuzzi",
+    "Dining Area": "featureDiningArea",
+    "Private Pool": "featurePrivatePool",
+    "Extra Beds": "featureExtraBeds",
+    "Seating Area": "featureSeatingArea",
+    "Family Friendly": "featureFamilyFriendly",
+    "Romantic Setup": "featureRomanticSetup",
+    "Private Terrace": "featurePrivateTerrace",
+  };
+  
+  const key = featureMap[feature];
+  if (key) {
+    return getTranslation(lang, key);
+  }
+  return feature; // Return original if not found
 };
 
