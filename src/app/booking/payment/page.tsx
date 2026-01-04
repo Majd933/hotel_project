@@ -7,7 +7,7 @@ import { getTranslation } from "@/lib/translations";
 import BookingTimeline from "@/components/BookingTimeline";
 import Link from "next/link";
 
-interface Room {
+interface RoomType {
   id: number;
   typeKey: string;
   descKey: string;
@@ -17,6 +17,13 @@ interface Room {
   beds: string;
   image: string;
   features: string[];
+}
+
+interface Room {
+  id: number;
+  roomTypeId: number;
+  roomNumber: string;
+  roomType: RoomType;
 }
 
 type Currency = "SYP" | "USD" | "EUR";
@@ -95,7 +102,7 @@ function PaymentPageContent() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-    return convertPrice(room.price * nights);
+    return convertPrice(room.roomType.price * nights);
   };
 
   const getNights = (): number => {
@@ -155,7 +162,7 @@ function PaymentPageContent() {
                 <div className="flex justify-between">
                   <span className="text-stone-600">{t("roomType")}:</span>
                   <span className="font-semibold text-stone-800">
-                    {t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                    {t(room.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                   </span>
                 </div>
                 <div className="flex justify-between">

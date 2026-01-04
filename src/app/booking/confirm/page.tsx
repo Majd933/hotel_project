@@ -9,7 +9,7 @@ import BookingTimeline from "@/components/BookingTimeline";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Room {
+interface RoomType {
   id: number;
   typeKey: string;
   descKey: string;
@@ -19,6 +19,13 @@ interface Room {
   beds: string;
   image: string;
   features: string[];
+}
+
+interface Room {
+  id: number;
+  roomTypeId: number;
+  roomNumber: string;
+  roomType: RoomType;
 }
 
 function ConfirmBookingContent() {
@@ -79,8 +86,8 @@ function ConfirmBookingContent() {
             {/* Room Image */}
             <div className="relative w-full h-64 md:h-96">
               <Image
-                src={room.image}
-                alt={t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                src={room.roomType.image}
+                alt={t(room.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                 fill
                 className="object-cover"
                 priority

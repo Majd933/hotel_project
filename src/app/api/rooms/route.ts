@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const rooms = await prisma.room.findMany({
+      include: {
+        roomType: true
+      },
       orderBy: { id: 'asc' }
     });
     return NextResponse.json(rooms);

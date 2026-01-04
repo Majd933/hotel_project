@@ -9,18 +9,48 @@ datasource db {
   provider = "postgresql"
 }
 
-model Room {
-  id          Int      @id @default(autoincrement())
-  typeKey     String
-  descKey     String
+model RoomType {
+  id          Int       @id @default(autoincrement())
+  typeKey     String    // For translations
+  descKey     String    // For translations
   price       Int
   size        Int
   guests      Int
   beds        String
   image       String
   features    String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  rooms       Room[]
+
+  @@map("room_types")
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  roomTypeId  Int
+  roomNumber  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  roomType    RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+
+  @@map("rooms")
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  roomId      Int
+  startDate   DateTime
+  endDate     DateTime
+  totalPrice  Int
+  currency    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("rooms")
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
 }

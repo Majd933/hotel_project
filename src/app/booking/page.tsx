@@ -8,7 +8,7 @@ import BookingTimeline from "@/components/BookingTimeline";
 import Link from "next/link";
 import Image from "next/image";
 
-interface Room {
+interface RoomType {
   id: number;
   typeKey: string;
   descKey: string;
@@ -18,6 +18,13 @@ interface Room {
   beds: string;
   image: string;
   features: string[];
+}
+
+interface Room {
+  id: number;
+  roomTypeId: number;
+  roomNumber: string;
+  roomType: RoomType;
 }
 
 type Currency = "SYP" | "USD" | "EUR";
@@ -36,17 +43,37 @@ export default function BookingPage() {
 
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [roomTypes, setRoomTypes] = useState<Room[]>([]); // One room per type
+  const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const [selectedRoomType, setSelectedRoomType] = useState<string | null>(null);
   const [currency, setCurrency] = useState<Currency>("USD");
   const [loading, setLoading] = useState(true);
+  const [availability, setAvailability] = useState<Record<string, { total: number; available: number; rooms: Room[] }>>({});
+  const [bookedDates, setBookedDates] = useState<Date[]>([]);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
   useEffect(() => {
     fetch('/api/rooms')
       .then(res => res.json())
       .then((data: Room[]) => {
         setRooms(data);
-        if (data.length > 0) {
-          setSelectedRoomId(data[0].id);
+        
+        // Get unique room types (one room per type)
+        const typesMap = new Map<string, Room>();
+        data.forEach(room => {
+          const typeKey = room.roomType.typeKey;
+          if (!typesMap.has(typeKey)) {
+            typesMap.set(typeKey, room);
+          }
+        });
+        const uniqueTypes = Array.from(typesMap.values());
+        setRoomTypes(uniqueTypes);
+        setAvailableRooms(uniqueTypes);
+        
+        if (uniqueTypes.length > 0) {
+          setSelectedRoomType(uniqueTypes[0].roomType.typeKey);
+          setSelectedRoomId(uniqueTypes[0].id);
         }
         setLoading(false);
       })
@@ -56,7 +83,130 @@ export default function BookingPage() {
       });
   }, []);
 
-  const selectedRoom = selectedRoomId !== null ? rooms.find(r => r.id === selectedRoomId) : undefined;
+  // Fetch booked dates for selected room type
+  useEffect(() => {
+    if (!selectedRoomType) {
+      setBookedDates([]);
+      return;
+    }
+
+    const fetchBookedDates = () => {
+      fetch(`/api/bookings/booked-dates-by-type?typeKey=${selectedRoomType}`)
+        .then(res => res.json())
+        .then((data: { bookedDates: string[] }) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'booking/page.tsx:96',message:'Received booked dates from API',data:{bookedDatesRaw:data.bookedDates,count:data.bookedDates.length,selectedRoomType},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+          // #endregion
+          
+          // Parse dateKeys (YYYY-MM-DD) as local dates to avoid timezone issues
+          const dates = data.bookedDates.map(dateKey => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'booking/page.tsx:101',message:'Parsing dateKey - BEFORE new Date',data:{dateKey},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
+            
+            // Parse dateKey (YYYY-MM-DD) as local date
+            const [year, month, day] = dateKey.split('-').map(Number);
+            const date = new Date(year, month - 1, day, 0, 0, 0, 0); // month is 0-indexed, use local time
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'booking/page.tsx:107',message:'Parsing dateKey - AFTER new Date',data:{dateKey,dateISO:date.toISOString(),dateLocal:date.toString(),dateYear:date.getFullYear(),dateMonth:date.getMonth(),dateDay:date.getDate()},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
+            
+            return date;
+          });
+          setBookedDates(dates);
+          
+          // Clear selected dates if any of them are now booked
+          setSelectedDates(prev => {
+            if (prev.length === 0) return prev;
+            const hasBookedDate = prev.some(selectedDate => {
+              const normalizedSelected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+              return dates.some(bookedDate => {
+                const normalizedBooked = new Date(bookedDate.getFullYear(), bookedDate.getMonth(), bookedDate.getDate());
+                return normalizedSelected.getTime() === normalizedBooked.getTime();
+              });
+            });
+            // If any selected date is booked, clear selection
+            if (hasBookedDate) {
+              return [];
+            }
+            return prev;
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching booked dates:', err);
+          setBookedDates([]);
+        });
+    };
+
+    fetchBookedDates();
+    // Refresh every 30 seconds in case bookings change
+    const interval = setInterval(fetchBookedDates, 30000);
+    return () => clearInterval(interval);
+  }, [selectedRoomType]);
+
+  // Check availability when dates are selected
+  useEffect(() => {
+    if (selectedDates.length === 2) {
+      setCheckingAvailability(true);
+      const startDate = selectedDates[0].toISOString();
+      const endDate = selectedDates[1].toISOString();
+      
+      fetch(`/api/rooms/availability?startDate=${startDate}&endDate=${endDate}`)
+        .then(res => res.json())
+        .then((data: { availability: Record<string, { total: number; available: number; rooms: Room[] }>, allAvailableRooms: Room[], bookedRoomIds: number[] }) => {
+          setAvailability(data.availability);
+          
+          // Get one room per type from available rooms, or use first room of type if none available
+          const typesMap = new Map<string, Room>();
+          roomTypes.forEach(roomType => {
+            const typeKey = roomType.roomType.typeKey;
+            const typeAvailability = data.availability[typeKey];
+            if (typeAvailability && typeAvailability.rooms.length > 0) {
+              // Use first available room of this type
+              typesMap.set(typeKey, typeAvailability.rooms[0]);
+            } else {
+              // Use first room of this type from all rooms (even if not available)
+              const firstRoomOfType = rooms.find(r => r.roomType.typeKey === typeKey);
+              if (firstRoomOfType) {
+                typesMap.set(typeKey, firstRoomOfType);
+              }
+            }
+          });
+          
+          const availableTypes = Array.from(typesMap.values());
+          setAvailableRooms(availableTypes);
+          
+          // Update selected room if current selection is not in available types
+          if (selectedRoomType) {
+            const currentTypeRoom = availableTypes.find(r => r.roomType.typeKey === selectedRoomType);
+            if (currentTypeRoom) {
+              setSelectedRoomId(currentTypeRoom.id);
+            } else if (availableTypes.length > 0) {
+              // Select first available type
+              setSelectedRoomType(availableTypes[0].roomType.typeKey);
+              setSelectedRoomId(availableTypes[0].id);
+            }
+          }
+          
+          setCheckingAvailability(false);
+        })
+        .catch(err => {
+          console.error('Error checking availability:', err);
+          setCheckingAvailability(false);
+          // On error, show all types
+          setAvailableRooms(roomTypes);
+        });
+    } else {
+      // No dates selected, show all room types
+      setAvailableRooms(roomTypes);
+      setAvailability({});
+    }
+  }, [selectedDates, rooms, roomTypes, selectedRoomType]);
+
+  const selectedRoom = selectedRoomId !== null 
+    ? (availableRooms.find(r => r.id === selectedRoomId) || rooms.find(r => r.id === selectedRoomId))
+    : undefined;
 
   const handleDateSelect = (date: Date) => {
     setSelectedDates((prev) => {
@@ -96,7 +246,7 @@ export default function BookingPage() {
   const calculateTotalPrice = (): number => {
     if (!selectedRoom || selectedDates.length !== 2) return 0;
     const nights = Math.ceil((selectedDates[1].getTime() - selectedDates[0].getTime()) / (1000 * 60 * 60 * 24));
-    return convertPrice(selectedRoom.price * nights);
+    return convertPrice(selectedRoom.roomType.price * nights);
   };
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -133,15 +283,41 @@ export default function BookingPage() {
                   {t("selectRoom")}
                 </label>
                 <select
-                  value={selectedRoomId || ""}
-                  onChange={(e) => setSelectedRoomId(Number(e.target.value))}
-                  className={`w-full px-4 py-3 border border-stone-300 rounded-lg text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-500 ${language === "ar" ? "text-right" : "text-left"}`}
+                  value={selectedRoomType || ""}
+                  onChange={(e) => {
+                    const typeKey = e.target.value;
+                    setSelectedRoomType(typeKey);
+                    // Find a room of this type (prefer available, otherwise any room of this type)
+                    const typeRoom = availableRooms.find(r => r.roomType.typeKey === typeKey) 
+                      || rooms.find(r => r.roomType.typeKey === typeKey);
+                    if (typeRoom) {
+                      setSelectedRoomId(typeRoom.id);
+                    }
+                  }}
+                  disabled={checkingAvailability}
+                  className={`w-full px-4 py-3 border border-stone-300 rounded-lg text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-500 ${language === "ar" ? "text-right" : "text-left"} ${checkingAvailability ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {rooms.map((room) => (
-                    <option key={room.id} value={room.id}>
-                      {t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)} - {formatPrice(room.price)} / {t("perNight")}
-                    </option>
-                  ))}
+                  {checkingAvailability ? (
+                    <option value="">{language === "ar" ? "جاري التحقق من التوفر..." : "Checking availability..."}</option>
+                  ) : roomTypes.length === 0 ? (
+                    <option value="">{language === "ar" ? "لا توجد غرف" : "No rooms"}</option>
+                  ) : (
+                    roomTypes.map((room) => {
+                      const typeKey = room.roomType.typeKey;
+                      const roomTypeAvailability = availability[typeKey];
+                      const isAvailable = roomTypeAvailability && roomTypeAvailability.available > 0;
+                      const availabilityText = roomTypeAvailability 
+                        ? `(${roomTypeAvailability.available}/${roomTypeAvailability.total} ${language === "ar" ? "متاح" : "available"})`
+                        : selectedDates.length === 2
+                        ? `(${language === "ar" ? "غير متاح" : "not available"})`
+                        : "";
+                      return (
+                        <option key={typeKey} value={typeKey} disabled={selectedDates.length === 2 && !isAvailable}>
+                          {t(typeKey as keyof typeof import("@/lib/translations").translations.ar)} - {formatPrice(room.roomType.price)} / {t("perNight")} {availabilityText}
+                        </option>
+                      );
+                    })
+                  )}
                 </select>
               </div>
 
@@ -165,20 +341,27 @@ export default function BookingPage() {
             {/* Room Details */}
             {selectedRoom && (
               <div className="p-4 bg-stone-50 rounded-lg">
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-3 gap-4 mb-2">
                   <div>
                     <span className="text-sm text-stone-600">{t("price")}: </span>
-                    <span className="text-lg font-bold text-stone-800">{formatPrice(selectedRoom.price)} / {t("perNight")}</span>
+                    <span className="text-lg font-bold text-stone-800">{formatPrice(selectedRoom.roomType.price)} / {t("perNight")}</span>
                   </div>
                   <div>
                     <span className="text-sm text-stone-600">{t("roomGuests")}: </span>
-                    <span className="text-lg font-semibold text-stone-800">{selectedRoom.guests}</span>
+                    <span className="text-lg font-semibold text-stone-800">{selectedRoom.roomType.guests}</span>
                   </div>
                   <div>
                     <span className="text-sm text-stone-600">{t("roomSize")}: </span>
-                    <span className="text-lg font-semibold text-stone-800">{selectedRoom.size} {t("squareMeters")}</span>
+                    <span className="text-lg font-semibold text-stone-800">{selectedRoom.roomType.size} {t("squareMeters")}</span>
                   </div>
                 </div>
+                {selectedDates.length === 2 && selectedRoomType && availability[selectedRoomType] && (
+                  <div className={`text-sm ${availability[selectedRoomType].available > 0 ? "text-green-700" : "text-red-700"} ${language === "ar" ? "text-right" : "text-left"}`}>
+                    {language === "ar" 
+                      ? `${availability[selectedRoomType].available} من ${availability[selectedRoomType].total} غرف متاحة`
+                      : `${availability[selectedRoomType].available} of ${availability[selectedRoomType].total} rooms available`}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -193,8 +376,8 @@ export default function BookingPage() {
             <div className={`lg:col-span-1 ${language === "ar" ? "lg:col-start-3" : ""}`}>
               <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg">
                 <Image
-                  src={selectedRoom.image}
-                  alt={t(selectedRoom.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                  src={selectedRoom.roomType.image}
+                  alt={t(selectedRoom.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                   fill
                   className="object-cover"
                 />
@@ -207,6 +390,7 @@ export default function BookingPage() {
             <BookingCalendar
               onDateSelect={handleDateSelect}
               selectedDates={selectedDates}
+              bookedDates={bookedDates}
             />
           </div>
         </div>
@@ -225,19 +409,35 @@ export default function BookingPage() {
               >
                 {t("cancel")}
               </Link>
-              {selectedRoom && selectedDates.length === 2 ? (
-                <Link
-                  href={`/booking/guest-info?roomId=${selectedRoom.id}&startDate=${selectedDates[0].toISOString()}&endDate=${selectedDates[1].toISOString()}&currency=${currency}`}
-                  className="bg-stone-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors whitespace-nowrap"
-                >
-                  {t("next")}
-                </Link>
-              ) : (
+              {selectedRoom && selectedDates.length === 2 && selectedRoomType && !checkingAvailability ? (() => {
+                const typeAvailability = availability[selectedRoomType];
+                const isAvailable = typeAvailability && typeAvailability.available > 0;
+                if (!isAvailable) {
+                  return (
+                    <button
+                      disabled
+                      className="bg-stone-400 text-stone-600 px-8 py-3 rounded-lg font-semibold cursor-not-allowed whitespace-nowrap opacity-50"
+                    >
+                      {language === "ar" ? "غير متاح" : "Not available"}
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    href={`/booking/guest-info?roomId=${selectedRoom.id}&startDate=${selectedDates[0].toISOString()}&endDate=${selectedDates[1].toISOString()}&currency=${currency}`}
+                    className="bg-stone-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors whitespace-nowrap"
+                  >
+                    {t("next")}
+                  </Link>
+                );
+              })() : (
                 <button
                   disabled
                   className="bg-stone-400 text-stone-600 px-8 py-3 rounded-lg font-semibold cursor-not-allowed whitespace-nowrap opacity-50"
                 >
-                  {t("next")}
+                  {checkingAvailability 
+                    ? (language === "ar" ? "جاري التحقق..." : "Checking...")
+                    : t("next")}
                 </button>
               )}
             </div>
@@ -269,3 +469,4 @@ export default function BookingPage() {
     </div>
   );
 }
+

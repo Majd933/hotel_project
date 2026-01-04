@@ -8,7 +8,7 @@ import BookingTimeline from "@/components/BookingTimeline";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Room {
+interface RoomType {
   id: number;
   typeKey: string;
   descKey: string;
@@ -18,6 +18,13 @@ interface Room {
   beds: string;
   image: string;
   features: string[];
+}
+
+interface Room {
+  id: number;
+  roomTypeId: number;
+  roomNumber: string;
+  roomType: RoomType;
 }
 
 interface GuestFormData {
@@ -47,6 +54,8 @@ function ReviewPageContent() {
   const [room, setRoom] = useState<Room | null>(null);
   const [guests, setGuests] = useState<GuestFormData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const roomId = searchParams.get("roomId");
   const startDate = searchParams.get("startDate");
@@ -111,7 +120,7 @@ function ReviewPageContent() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-    return convertPrice(room.price * nights);
+    return convertPrice(room.roomType.price * nights);
   };
 
   const getNights = (): number => {
@@ -129,10 +138,46 @@ function ReviewPageContent() {
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  const handleConfirmBooking = () => {
-    // Navigate to confirm page
-    const confirmUrl = `/booking/confirm?${searchParams.toString()}`;
-    router.push(confirmUrl);
+  const handleConfirmBooking = async () => {
+    if (!room || !startDate || !endDate || !roomId) {
+      setError(language === "ar" ? "بيانات الحجز غير مكتملة" : "Booking data is incomplete");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const totalPrice = calculateTotalPrice();
+      
+      // Create booking via API
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          roomId: Number(roomId),
+          startDate: startDate,
+          endDate: endDate,
+          totalPrice: totalPrice,
+          currency: currency,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || (language === "ar" ? "فشل في إنشاء الحجز" : "Failed to create booking"));
+      }
+
+      // Navigate to confirm page
+      const confirmUrl = `/booking/confirm?${searchParams.toString()}`;
+      router.push(confirmUrl);
+    } catch (err) {
+      console.error('Error creating booking:', err);
+      setError(err instanceof Error ? err.message : (language === "ar" ? "حدث خطأ أثناء الحجز" : "An error occurred while booking"));
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -164,8 +209,8 @@ function ReviewPageContent() {
             {/* Room Image */}
             <div className="relative w-full h-64 md:h-96">
               <Image
-                src={room.image}
-                alt={t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                src={room.roomType.image}
+                alt={t(room.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                 fill
                 className="object-cover"
                 priority
@@ -177,23 +222,23 @@ function ReviewPageContent() {
               {/* Room Details */}
               <div className={`mb-6 ${language === "ar" ? "text-right" : "text-left"}`}>
                 <h2 className={`text-2xl font-bold text-stone-800 mb-2 font-playfair ${language === "ar" ? "font-cairo" : ""}`}>
-                  {t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                  {t(room.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                 </h2>
                 <p className="text-stone-600 mb-4">
-                  {t(room.descKey as keyof typeof import("@/lib/translations").translations.ar)}
+                  {t(room.roomType.descKey as keyof typeof import("@/lib/translations").translations.ar)}
                 </p>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <span className="text-sm text-stone-600">{t("roomGuests")}: </span>
-                    <span className="font-semibold text-stone-800">{room.guests}</span>
+                    <span className="font-semibold text-stone-800">{room.roomType.guests}</span>
                   </div>
                   <div>
                     <span className="text-sm text-stone-600">{t("roomSize")}: </span>
-                    <span className="font-semibold text-stone-800">{room.size} {t("squareMeters")}</span>
+                    <span className="font-semibold text-stone-800">{room.roomType.size} {t("squareMeters")}</span>
                   </div>
                   <div>
                     <span className="text-sm text-stone-600">{t("roomBeds")}: </span>
-                    <span className="font-semibold text-stone-800">{room.beds}</span>
+                    <span className="font-semibold text-stone-800">{room.roomType.beds}</span>
                   </div>
                 </div>
               </div>
@@ -265,9 +310,9 @@ function ReviewPageContent() {
                 <div className="bg-stone-50 p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-stone-600">
-                      {formatPrice(room.price)} × {getNights()} {getNights() === 1 ? (language === "ar" ? "ليلة" : "night") : (language === "ar" ? "ليالي" : "nights")}
+                      {formatPrice(room.roomType.price)} × {getNights()} {getNights() === 1 ? (language === "ar" ? "ليلة" : "night") : (language === "ar" ? "ليالي" : "nights")}
                     </span>
-                    <span className="text-stone-600">{formatPrice(room.price * getNights())}</span>
+                    <span className="text-stone-600">{formatPrice(room.roomType.price * getNights())}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-stone-300">
                     <span className="text-xl font-bold text-stone-800">{t("totalPrice")}</span>
@@ -275,6 +320,13 @@ function ReviewPageContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className={`mb-4 p-4 bg-red-50 border border-red-200 rounded-lg ${language === "ar" ? "text-right" : "text-left"}`}>
+                  <p className={`text-red-700 ${language === "ar" ? "font-cairo" : ""}`}>{error}</p>
+                </div>
+              )}
 
               {/* Navigation Buttons */}
               <div className={`flex gap-4 ${language === "ar" ? "flex-row-reverse" : ""}`}>
@@ -292,9 +344,12 @@ function ReviewPageContent() {
                 </Link>
                 <button
                   onClick={handleConfirmBooking}
-                  className={`flex-1 bg-stone-800 text-white py-4 rounded-lg font-semibold hover:bg-stone-700 transition-colors ${language === "ar" ? "font-cairo" : ""}`}
+                  disabled={isSubmitting}
+                  className={`flex-1 bg-stone-800 text-white py-4 rounded-lg font-semibold hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${language === "ar" ? "font-cairo" : ""}`}
                 >
-                  {t("bookNow")}
+                  {isSubmitting 
+                    ? (language === "ar" ? "جاري الحجز..." : "Booking...")
+                    : t("bookNow")}
                 </button>
               </div>
             </div>

@@ -20,12 +20,14 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('Clearing existing rooms...');
+  console.log('Clearing existing bookings, rooms, and room types...');
+  await prisma.booking.deleteMany({});
   await prisma.room.deleteMany({});
+  await prisma.roomType.deleteMany({});
   
-  console.log('Seeding 5 star hotel rooms...');
+  console.log('Creating 5 room types...');
   
-  const rooms = [
+  const roomTypeData = [
     {
       typeKey: "roomType1",
       descKey: "roomType1Desc",
@@ -35,6 +37,7 @@ async function main() {
       beds: "1",
       image: "/images/rooms/deluxe-room.jpg",
       features: ["Wi-Fi", "TV", "Minibar", "AC", "Sea View", "Balcony"],
+      roomNumbers: ["101", "102"],
     },
     {
       typeKey: "roomType2",
@@ -45,6 +48,7 @@ async function main() {
       beds: "1",
       image: "/images/rooms/luxury-suite.jpg",
       features: ["Wi-Fi", "TV", "Kitchen", "Living Room", "Balcony", "Jacuzzi"],
+      roomNumbers: ["201", "202"],
     },
     {
       typeKey: "roomType3",
@@ -55,6 +59,7 @@ async function main() {
       beds: "2",
       image: "/images/rooms/presidential-suite.jpg",
       features: ["Wi-Fi", "TV", "Kitchen", "Living Room", "Balcony", "Dining Area", "Private Pool"],
+      roomNumbers: ["301", "302"],
     },
     {
       typeKey: "roomType4",
@@ -65,6 +70,7 @@ async function main() {
       beds: "2",
       image: "/images/rooms/family-room.jpg",
       features: ["Wi-Fi", "TV", "Extra Beds", "Seating Area", "AC", "Family Friendly"],
+      roomNumbers: ["401", "402"],
     },
     {
       typeKey: "roomType5",
@@ -75,16 +81,31 @@ async function main() {
       beds: "1",
       image: "/images/rooms/honeymoon-suite.jpg",
       features: ["Wi-Fi", "TV", "Jacuzzi", "Romantic Setup", "Balcony", "Minibar", "Private Terrace"],
+      roomNumbers: ["501", "502"],
     },
   ];
   
-  for (const room of rooms) {
-    await prisma.room.create({
-      data: room,
+  // Create room types first
+  for (const typeData of roomTypeData) {
+    const { roomNumbers, ...roomTypeFields } = typeData;
+    
+    // Create RoomType
+    const roomType = await prisma.roomType.create({
+      data: roomTypeFields,
     });
+    
+    // Create 2 rooms for each room type
+    for (const roomNumber of roomNumbers) {
+      await prisma.room.create({
+        data: {
+          roomTypeId: roomType.id,
+          roomNumber: roomNumber,
+        },
+      });
+    }
   }
   
-  console.log(`Seeding completed! ${rooms.length} rooms added successfully.`);
+  console.log(`Seeding completed! 5 room types and 10 rooms added successfully.`);
 }
 
 main()

@@ -15,7 +15,7 @@ interface GuestFormData {
   notes: string;
 }
 
-interface Room {
+interface RoomType {
   id: number;
   typeKey: string;
   descKey: string;
@@ -25,6 +25,13 @@ interface Room {
   beds: string;
   image: string;
   features: string[];
+}
+
+interface Room {
+  id: number;
+  roomTypeId: number;
+  roomNumber: string;
+  roomType: RoomType;
 }
 
 function GuestInfoPageContent() {
