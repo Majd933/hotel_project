@@ -12,10 +12,10 @@ export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white mt-auto">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {/* About Section */}
           <div>
-            <h3 className="text-xl font-bold mb-4">🏨 {t("hotelName")}</h3>
+            <h3 className="text-xl font-bold mb-4">{t("hotelName")}</h3>
             <p className="text-gray-400">
               {t("footerDescription")}
             </p>
@@ -70,33 +70,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social Media */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">{t("followUs")}</h4>
-            <div className="flex gap-4">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Facebook"
-              >
-                📘
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Twitter"
-              >
-                🐦
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Instagram"
-              >
-                📷
-              </a>
-            </div>
-          </div>
         </div>
 
         {/* Copyright */}

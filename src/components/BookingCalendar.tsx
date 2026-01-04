@@ -66,6 +66,15 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
     );
   };
 
+  const isInRange = (date: Date | null) => {
+    if (!date || selectedDates.length !== 2) return false;
+    const [startDate, endDate] = selectedDates;
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const normalizedStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const normalizedEnd = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    return normalizedDate >= normalizedStart && normalizedDate <= normalizedEnd;
+  };
+
   const isPastDate = (date: Date | null) => {
     if (!date) return false;
     const today = new Date();
@@ -103,6 +112,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
           
           {days1.map((date, index) => {
             const selected = isSelected(date);
+            const inRange = isInRange(date);
             const past = isPastDate(date);
             
             return (
@@ -113,7 +123,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past ? "text-stone-300 cursor-not-allowed" : "text-stone-800 hover:bg-stone-100"}
-                  ${selected ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${selected || inRange ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
               >
                 {date && (
@@ -142,6 +152,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
           
           {days2.map((date, index) => {
             const selected = isSelected(date);
+            const inRange = isInRange(date);
             const past = isPastDate(date);
             
             return (
@@ -152,7 +163,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [] }: Bo
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past ? "text-stone-300 cursor-not-allowed" : "text-stone-800 hover:bg-stone-100"}
-                  ${selected ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${selected || inRange ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
               >
                 {date && (
