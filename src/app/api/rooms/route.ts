@@ -9,10 +9,8 @@ export async function GET() {
     return NextResponse.json(rooms);
   } catch (error) {
     console.error('Error fetching rooms:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch rooms' },
-      { status: 500 }
-    );
+    // Return empty array instead of error object to prevent .map() errors
+    return NextResponse.json([], { status: 500 });
   }
 }
 

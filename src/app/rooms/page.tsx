@@ -30,11 +30,18 @@ export default function RoomsPage() {
     fetch('/api/rooms')
       .then(res => res.json())
       .then(data => {
-        setRooms(data);
+        // Ensure data is an array
+        if (Array.isArray(data)) {
+          setRooms(data);
+        } else {
+          console.error('Invalid data format:', data);
+          setRooms([]);
+        }
         setLoading(false);
       })
       .catch(err => {
         console.error('Error fetching rooms:', err);
+        setRooms([]);
         setLoading(false);
       });
   }, []);
