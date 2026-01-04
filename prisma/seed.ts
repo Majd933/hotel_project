@@ -25,7 +25,7 @@ async function main() {
   
   console.log('Seeding 5 star hotel rooms...');
   
-  const imageUrl = "https://zvljofpgzjektmposucx.supabase.co/storage/v1/object/sign/hotel_bucket/first_room.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMDA2NWNkZC00M2YzLTQxNTEtOTA5ZC0wOWI4MWMyY2NmMzQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJob3RlbF9idWNrZXQvZmlyc3Rfcm9vbS5qcGciLCJpYXQiOjE3NjY2OTE0OTYsImV4cCI6MTc2NzI5NjI5Nn0.7daTLCP3dJHwSZyEMs2dAqPWXJi6uKXb73q8lkmL6ng";
+  const imageUrl = "https://zvljofpgzjektmposucx.supabase.co/storage/v1/object/sign/hotel_bucket/first_room.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMDA2NWNkZC00M2YzLTQxNTEtOTA5ZC0wOWI4MWMyY2NmMzQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJob3RlbF9idWNrZXQvZmlyc3Rfcm9vbS5qcGciLCJpYXQiOjE3Njc1MjIzNTYsImV4cCI6MTkyNTIwMjM1Nn0.Di6us-263VddvqTajOYkm_0ZZwKZF-JkT_jF07naFLc";
   
   const rooms = [
     {
