@@ -83,7 +83,7 @@ export default function RoomsPage() {
       {/* Rooms Grid */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {rooms.map((room) => (
+          {rooms.map((room, index) => (
             <div
               key={room.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -98,6 +98,8 @@ export default function RoomsPage() {
                   alt={t(room.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
                   fill
                   className="object-cover"
+                  priority={index < 3}
+                  unoptimized={true}
                   onError={(e) => {
                     // Hide image on error, fallback gradient will show
                     const target = e.target as HTMLImageElement;

@@ -25,8 +25,6 @@ async function main() {
   
   console.log('Seeding 5 star hotel rooms...');
   
-  const imageUrl = "https://zvljofpgzjektmposucx.supabase.co/storage/v1/object/sign/hotel_bucket/first_room.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMDA2NWNkZC00M2YzLTQxNTEtOTA5ZC0wOWI4MWMyY2NmMzQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJob3RlbF9idWNrZXQvZmlyc3Rfcm9vbS5qcGciLCJpYXQiOjE3Njc1MjIzNTYsImV4cCI6MTkyNTIwMjM1Nn0.Di6us-263VddvqTajOYkm_0ZZwKZF-JkT_jF07naFLc";
-  
   const rooms = [
     {
       typeKey: "roomType1",
@@ -35,7 +33,7 @@ async function main() {
       size: 40,
       guests: 2,
       beds: "1",
-      image: imageUrl,
+      image: "/images/rooms/deluxe-room.jpg",
       features: ["Wi-Fi", "TV", "Minibar", "AC", "Sea View", "Balcony"],
     },
     {
@@ -45,7 +43,7 @@ async function main() {
       size: 55,
       guests: 2,
       beds: "1",
-      image: imageUrl,
+      image: "/images/rooms/luxury-suite.jpg",
       features: ["Wi-Fi", "TV", "Kitchen", "Living Room", "Balcony", "Jacuzzi"],
     },
     {
@@ -55,7 +53,7 @@ async function main() {
       size: 80,
       guests: 4,
       beds: "2",
-      image: imageUrl,
+      image: "/images/rooms/presidential-suite.jpg",
       features: ["Wi-Fi", "TV", "Kitchen", "Living Room", "Balcony", "Dining Area", "Private Pool"],
     },
     {
@@ -65,7 +63,7 @@ async function main() {
       size: 60,
       guests: 4,
       beds: "2",
-      image: imageUrl,
+      image: "/images/rooms/family-room.jpg",
       features: ["Wi-Fi", "TV", "Extra Beds", "Seating Area", "AC", "Family Friendly"],
     },
     {
@@ -75,7 +73,7 @@ async function main() {
       size: 100,
       guests: 2,
       beds: "1",
-      image: imageUrl,
+      image: "/images/rooms/honeymoon-suite.jpg",
       features: ["Wi-Fi", "TV", "Jacuzzi", "Romantic Setup", "Balcony", "Minibar", "Private Terrace"],
     },
   ];
