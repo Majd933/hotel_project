@@ -94,9 +94,11 @@ export default function BookingPage() {
       fetch(`/api/bookings/booked-dates-by-type?typeKey=${selectedRoomType}`)
         .then(res => res.json())
         .then((data: { bookedDates: string[] }) => {
-          const dates = data.bookedDates.map(dateStr => {
-            const date = new Date(dateStr);
-            date.setHours(0, 0, 0, 0); // Normalize time
+          // Parse dateKeys (YYYY-MM-DD) as local dates to avoid timezone issues
+          const dates = data.bookedDates.map(dateKey => {
+            // Parse dateKey (YYYY-MM-DD) as local date
+            const [year, month, day] = dateKey.split('-').map(Number);
+            const date = new Date(year, month - 1, day, 0, 0, 0, 0); // month is 0-indexed, use local time
             return date;
           });
           setBookedDates(dates);

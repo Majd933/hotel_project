@@ -134,8 +134,8 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? "text-stone-400 bg-red-50 border-red-200" : "text-stone-800 hover:bg-stone-100"}
-                  ${selected || inRange ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-red-600 text-white border-red-700" : "text-stone-400 bg-red-50 border-red-200") : "text-stone-800 hover:bg-stone-100"}
+                  ${!booked && (selected || inRange) ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
@@ -144,15 +144,15 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                     <div className="text-base font-medium">{date.getDate()}</div>
                     {booked && !past && (
                       <svg 
-                        className="absolute top-1 right-1 w-4 h-4 text-red-500"
+                        className={`absolute top-1 right-1 w-5 h-5 ${selected || inRange ? "text-white" : "text-red-600"}`}
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
+                        strokeWidth={3}
                       >
                         <path 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
-                          strokeWidth={2} 
                           d="M6 18L18 6M6 6l12 12" 
                         />
                       </svg>
@@ -194,8 +194,8 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? "text-stone-400 bg-red-50 border-red-200" : "text-stone-800 hover:bg-stone-100"}
-                  ${selected || inRange ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-red-600 text-white border-red-700" : "text-stone-400 bg-red-50 border-red-200") : "text-stone-800 hover:bg-stone-100"}
+                  ${!booked && (selected || inRange) ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
@@ -204,15 +204,15 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                     <div className="text-base font-medium">{date.getDate()}</div>
                     {booked && !past && (
                       <svg 
-                        className="absolute top-1 right-1 w-4 h-4 text-red-500"
+                        className={`absolute top-1 right-1 w-5 h-5 ${selected || inRange ? "text-white" : "text-red-600"}`}
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
+                        strokeWidth={3}
                       >
                         <path 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
-                          strokeWidth={2} 
                           d="M6 18L18 6M6 6l12 12" 
                         />
                       </svg>
