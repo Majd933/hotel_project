@@ -33,14 +33,15 @@ export async function GET(request: NextRequest) {
     });
 
     // Get all bookings that overlap with the date range
+    // Note: checkout day (endDate) is available for new bookings, so we use > instead of >=
     const overlappingBookings = await prisma.booking.findMany({
       where: {
         OR: [
           // Booking starts before range ends and ends after range starts
           {
             AND: [
-              { startDate: { lte: end } },
-              { endDate: { gte: start } }
+              { startDate: { lt: end } },
+              { endDate: { gt: start } }
             ]
           }
         ]

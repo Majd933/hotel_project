@@ -49,17 +49,28 @@ export async function GET(request: NextRequest) {
     // Get unique dates where all rooms of this type are booked
     const bookingsByDate = new Map<string, Set<number>>();
 
+    // Helper function to parse dates using local time components (same as booking creation)
+    const parseLocalDate = (dateValue: Date | string): Date => {
+      if (dateValue instanceof Date) {
+        // Use local time components directly to avoid timezone conversion issues
+        return new Date(dateValue.getFullYear(), dateValue.getMonth(), dateValue.getDate(), 0, 0, 0, 0);
+      } else {
+        // Handle both ISO format (YYYY-MM-DDTHH:mm:ss.sssZ) and SQL format (YYYY-MM-DD HH:mm:ss)
+        const parts = dateValue.split('T');
+        const datePart = parts.length > 1 ? parts[0] : dateValue.split(' ')[0];
+        const [year, month, day] = datePart.split('-').map(Number);
+        return new Date(year, month - 1, day, 0, 0, 0, 0);
+      }
+    };
+
     allBookings.forEach(booking => {
-      const start = new Date(booking.startDate);
-      const end = new Date(booking.endDate);
+      // Parse dates using local time components to match how they were saved
+      const start = parseLocalDate(booking.startDate);
+      const end = parseLocalDate(booking.endDate);
       
-      // Normalize dates to start of day
-      start.setHours(0, 0, 0, 0);
-      end.setHours(0, 0, 0, 0);
-      
-      // Iterate through each day in the booking range (including checkout day to prevent new bookings on same day)
+      // Iterate through each day in the booking range (excluding checkout day, as room is available on checkout day)
       const currentDate = new Date(start);
-      while (currentDate <= end) {
+      while (currentDate < end) {
         // Use local date components to create dateKey (YYYY-MM-DD) to avoid timezone issues
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth() + 1;

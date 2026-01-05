@@ -65,14 +65,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for overlapping bookings (race condition prevention)
+    // Note: checkout day (endDate) is available for new bookings, so we use > instead of >=
     const overlappingBooking = await prisma.booking.findFirst({
       where: {
         roomId: roomId,
         OR: [
           {
             AND: [
-              { startDate: { lte: end } },
-              { endDate: { gte: start } }
+              { startDate: { lt: end } },
+              { endDate: { gt: start } }
             ]
           }
         ]
