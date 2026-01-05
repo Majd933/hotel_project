@@ -94,44 +94,12 @@ export default function BookingPage() {
       fetch(`/api/bookings/booked-dates-by-type?typeKey=${selectedRoomType}`)
         .then(res => res.json())
         .then((data: { bookedDates: string[] }) => {
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'booking/page.tsx:96',message:'Received booked dates from API',data:{bookedDatesRaw:data.bookedDates,count:data.bookedDates.length,selectedRoomType},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-          // #endregion
-          
-          // Parse dateKeys (YYYY-MM-DD) as local dates to avoid timezone issues
-          const dates = data.bookedDates.map(dateKey => {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'booking/page.tsx:101',message:'Parsing dateKey - BEFORE new Date',data:{dateKey},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
-            
-            // Parse dateKey (YYYY-MM-DD) as local date
-            const [year, month, day] = dateKey.split('-').map(Number);
-            const date = new Date(year, month - 1, day, 0, 0, 0, 0); // month is 0-indexed, use local time
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'booking/page.tsx:107',message:'Parsing dateKey - AFTER new Date',data:{dateKey,dateISO:date.toISOString(),dateLocal:date.toString(),dateYear:date.getFullYear(),dateMonth:date.getMonth(),dateDay:date.getDate()},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
-            
+          const dates = data.bookedDates.map(dateStr => {
+            const date = new Date(dateStr);
+            date.setHours(0, 0, 0, 0); // Normalize time
             return date;
           });
           setBookedDates(dates);
-          
-          // Clear selected dates if any of them are now booked
-          setSelectedDates(prev => {
-            if (prev.length === 0) return prev;
-            const hasBookedDate = prev.some(selectedDate => {
-              const normalizedSelected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-              return dates.some(bookedDate => {
-                const normalizedBooked = new Date(bookedDate.getFullYear(), bookedDate.getMonth(), bookedDate.getDate());
-                return normalizedSelected.getTime() === normalizedBooked.getTime();
-              });
-            });
-            // If any selected date is booked, clear selection
-            if (hasBookedDate) {
-              return [];
-            }
-            return prev;
-          });
         })
         .catch(err => {
           console.error('Error fetching booked dates:', err);

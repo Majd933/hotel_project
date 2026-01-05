@@ -86,17 +86,10 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
   const isBooked = (date: Date | null) => {
     if (!date || bookedDates.length === 0) return false;
     const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const result = bookedDates.some((bookedDate) => {
+    return bookedDates.some((bookedDate) => {
       const normalizedBooked = new Date(bookedDate.getFullYear(), bookedDate.getMonth(), bookedDate.getDate());
-      const match = normalizedBooked.getTime() === normalizedDate.getTime();
-      
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/21eb7cda-305a-4391-a92f-7c2a923489c0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BookingCalendar.tsx:90',message:'Date comparison in isBooked',data:{dateISO:date.toISOString(),bookedDateISO:bookedDate.toISOString(),normalizedDateISO:normalizedDate.toISOString(),normalizedBookedISO:normalizedBooked.toISOString(),normalizedDateTime:normalizedDate.getTime(),normalizedBookedTime:normalizedBooked.getTime(),match,dateYear:date.getFullYear(),dateMonth:date.getMonth(),dateDay:date.getDate(),bookedYear:bookedDate.getFullYear(),bookedMonth:bookedDate.getMonth(),bookedDay:bookedDate.getDate()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
-      
-      return match;
+      return normalizedBooked.getTime() === normalizedDate.getTime();
     });
-    return result;
   };
 
   const handleDateClick = (date: Date | null) => {
@@ -141,8 +134,8 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-red-600 text-white border-red-700" : "text-stone-400 bg-red-50 border-red-200") : "text-stone-800 hover:bg-stone-100"}
-                  ${!booked && (selected || inRange) ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${past ? "text-stone-300" : booked ? "text-stone-400 bg-red-50 border-red-200" : "text-stone-800 hover:bg-stone-100"}
+                  ${selected || inRange ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
@@ -151,15 +144,15 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                     <div className="text-base font-medium">{date.getDate()}</div>
                     {booked && !past && (
                       <svg 
-                        className={`absolute top-1 right-1 w-5 h-5 ${selected || inRange ? "text-white" : "text-red-600"}`}
+                        className="absolute top-1 right-1 w-4 h-4 text-red-500"
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
-                        strokeWidth={3}
                       >
                         <path 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
+                          strokeWidth={2} 
                           d="M6 18L18 6M6 6l12 12" 
                         />
                       </svg>
@@ -201,8 +194,8 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-red-600 text-white border-red-700" : "text-stone-400 bg-red-50 border-red-200") : "text-stone-800 hover:bg-stone-100"}
-                  ${!booked && (selected || inRange) ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${past ? "text-stone-300" : booked ? "text-stone-400 bg-red-50 border-red-200" : "text-stone-800 hover:bg-stone-100"}
+                  ${selected || inRange ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
@@ -211,15 +204,15 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                     <div className="text-base font-medium">{date.getDate()}</div>
                     {booked && !past && (
                       <svg 
-                        className={`absolute top-1 right-1 w-5 h-5 ${selected || inRange ? "text-white" : "text-red-600"}`}
+                        className="absolute top-1 right-1 w-4 h-4 text-red-500"
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
-                        strokeWidth={3}
                       >
                         <path 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
+                          strokeWidth={2} 
                           d="M6 18L18 6M6 6l12 12" 
                         />
                       </svg>
