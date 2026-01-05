@@ -93,7 +93,7 @@ function GuestInfoPageContent() {
   }, [roomId, startDate, endDate, router]);
 
   const addGuest = () => {
-    if (room && guests.length < room.guests) {
+    if (room && guests.length < room.roomType.guests) {
       setGuests([...guests, {
         firstName: "",
         lastName: "",
@@ -371,7 +371,7 @@ function GuestInfoPageContent() {
             ))}
 
             {/* Add Guest Button - Show after all guest forms */}
-            {room && guests.length < room.guests && (
+            {room && guests.length < room.roomType.guests && (
               <div className={`text-center ${language === "ar" ? "text-right" : "text-left"}`}>
                 <button
                   type="button"
