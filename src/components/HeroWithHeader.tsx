@@ -61,7 +61,7 @@ export default function HeroWithHeader({ children }: { children: React.ReactNode
               d="M 7.5 15 L 40 40 L 72.5 15"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="miter"
               className="text-white/90 group-hover:text-white transition-colors duration-300"

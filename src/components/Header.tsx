@@ -50,7 +50,17 @@ export default function Header() {
     <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
       isScrolled ? "bg-stone-200/95 backdrop-blur-sm" : "bg-transparent"
     }`}>
-      <nav className="w-full px-4 py-4">
+      <nav className="w-full px-4 py-4 relative">
+        {/* Logo - Center - Always in the middle */}
+        <Link 
+          href="/home" 
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl font-bold font-playfair transition-colors ${
+            isScrolled ? "text-stone-800" : "text-white"
+          }`}
+        >
+          {t("hotelName")}
+        </Link>
+        
         <div className={`flex items-center justify-between ${language === "en" ? "flex-row-reverse" : ""}`}>
           {/* Booking Button */}
           <div className="flex items-center">
@@ -66,15 +76,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Logo - Center */}
-          <Link href="/home" className={`text-4xl font-bold font-playfair transition-colors ${
-            isScrolled ? "text-stone-800" : "text-white"
-          }`}>
-            {t("hotelName")}
-          </Link>
-
           {/* Language Toggle & Pages Dropdown */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             {language === "ar" ? (
               <>
                 {/* Language Toggle Button - First in Arabic */}
