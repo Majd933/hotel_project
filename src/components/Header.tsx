@@ -5,13 +5,19 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
 
-export default function Header() {
+export default function Header({ hideBookButton = false, forceDarkText = false }: { hideBookButton?: boolean; forceDarkText?: boolean }) {
   const { language, toggleLanguage } = useLanguage();
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pagesDropdownRef = useRef<HTMLDivElement>(null);
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
     getTranslation(language, key);
+  
+  // Determine text color: force dark if specified, otherwise use scrolled state
+  const textColor = forceDarkText ? "text-stone-800" : (isScrolled ? "text-stone-800" : "text-white");
+  const hoverColor = forceDarkText 
+    ? "hover:text-stone-600 hover:bg-stone-100" 
+    : (isScrolled ? "hover:text-stone-600 hover:bg-stone-100" : "hover:text-stone-200 hover:bg-white/10");
 
   // Handle scroll to change background
   useEffect(() => {
@@ -54,9 +60,7 @@ export default function Header() {
         {/* Logo - Center - Always in the middle */}
         <Link 
           href="/home" 
-          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl font-bold font-playfair transition-colors ${
-            isScrolled ? "text-stone-800" : "text-white"
-          }`}
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl font-bold font-playfair transition-colors ${textColor}`}
         >
           {t("hotelName")}
         </Link>
@@ -64,16 +68,18 @@ export default function Header() {
         <div className={`flex items-center justify-between ${language === "en" ? "flex-row-reverse" : ""}`}>
           {/* Booking Button */}
           <div className="flex items-center">
-            <Link
-              href="/booking"
-              className={`px-6 py-2.5 rounded-lg font-semibold transition-all text-lg ${
-                isScrolled
-                  ? "bg-stone-800 text-stone-50 hover:bg-stone-700"
-                  : "bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white/20"
-              }`}
-            >
-              {t("bookNow")}
-            </Link>
+            {!hideBookButton && (
+              <Link
+                href="/booking"
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-all text-lg ${
+                  isScrolled
+                    ? "bg-stone-800 text-stone-50 hover:bg-stone-700"
+                    : "bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white/20"
+                }`}
+              >
+                {t("bookNow")}
+              </Link>
+            )}
           </div>
 
           {/* Language Toggle & Pages Dropdown */}
@@ -83,11 +89,7 @@ export default function Header() {
                 {/* Language Toggle Button - First in Arabic */}
                 <button
                   onClick={toggleLanguage}
-                  className={`transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${
-                    isScrolled 
-                      ? "text-stone-800 hover:text-stone-600 hover:bg-stone-100" 
-                      : "text-white hover:text-stone-200 hover:bg-white/10"
-                  }`}
+                  className={`transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${textColor} ${hoverColor}`}
                   aria-label="Toggle language"
                 >
                   <span className="text-xl font-semibold">عربي</span>
@@ -97,11 +99,7 @@ export default function Header() {
                 <div className="relative" ref={pagesDropdownRef}>
               <button
                 onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
-                className={`flex items-center gap-2 transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${
-                  isScrolled 
-                    ? "text-stone-800 hover:text-stone-600 hover:bg-stone-100" 
-                    : "text-white hover:text-stone-200 hover:bg-white/10"
-                }`}
+                className={`flex items-center gap-2 transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${textColor} ${hoverColor}`}
                 aria-label="Select page"
               >
                 {/* Menu Icon */}
@@ -192,11 +190,7 @@ export default function Header() {
                 <div className="relative" ref={pagesDropdownRef}>
                   <button
                     onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
-                    className={`flex items-center gap-2 transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${
-                      isScrolled 
-                        ? "text-stone-800 hover:text-stone-600 hover:bg-stone-100" 
-                        : "text-white hover:text-stone-200 hover:bg-white/10"
-                    }`}
+                    className={`flex items-center gap-2 transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${textColor} ${hoverColor}`}
                     aria-label="Select page"
                   >
                     {/* Menu Icon */}
@@ -284,11 +278,7 @@ export default function Header() {
                 {/* Language Toggle Button - Second in English */}
                 <button
                   onClick={toggleLanguage}
-                  className={`transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${
-                    isScrolled 
-                      ? "text-stone-800 hover:text-stone-600 hover:bg-stone-100" 
-                      : "text-white hover:text-stone-200 hover:bg-white/10"
-                  }`}
+                  className={`transition-colors font-medium px-5 py-2.5 rounded-lg text-lg ${textColor} ${hoverColor}`}
                   aria-label="Toggle language"
                 >
                   <span className="text-xl font-semibold">EN</span>
@@ -298,9 +288,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className={`md:hidden transition-colors ${
-            isScrolled ? "text-stone-800 hover:text-stone-600" : "text-white hover:text-stone-200"
-          }`}>
+          <button className={`md:hidden transition-colors ${textColor} ${forceDarkText || isScrolled ? "hover:text-stone-600" : "hover:text-stone-200"}`}>
             <svg
               className="w-6 h-6"
               fill="none"

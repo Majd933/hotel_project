@@ -107,7 +107,7 @@ function ConfirmBookingContent() {
               {/* Back to Home Button */}
               <Link
                 href="/home"
-                className={`inline-block bg-stone-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-stone-700 transition-colors ${language === "ar" ? "font-cairo" : ""}`}
+                className={`inline-block bg-gray-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors ${language === "ar" ? "font-cairo" : ""}`}
               >
                 {t("backToHome")}
               </Link>

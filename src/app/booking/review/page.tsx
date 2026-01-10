@@ -345,7 +345,7 @@ function ReviewPageContent() {
                 <button
                   onClick={handleConfirmBooking}
                   disabled={isSubmitting}
-                  className={`flex-1 bg-stone-800 text-white py-4 rounded-lg font-semibold hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${language === "ar" ? "font-cairo" : ""}`}
+                  className={`flex-1 bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${language === "ar" ? "font-cairo" : ""}`}
                 >
                   {isSubmitting 
                     ? (language === "ar" ? "جاري الحجز..." : "Booking...")

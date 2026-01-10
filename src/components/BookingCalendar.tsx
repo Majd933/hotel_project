@@ -48,7 +48,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
 
   const formatMonthYear = (date: Date) => {
     const months = language === "ar" 
-      ? ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+      ? ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"]
       : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     return `${months[date.getMonth()]} ${date.getFullYear()}`;
   };
@@ -134,26 +134,33 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-red-600 text-white border-red-700" : "text-stone-400 bg-red-50 border-red-200") : "text-stone-800 hover:bg-stone-100"}
-                  ${!booked && (selected || inRange) ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-gray-900 text-white border-gray-900" : "text-stone-400 bg-stone-100 border-stone-300") : "text-stone-800 hover:bg-stone-100"}
+                  ${!booked && (selected || inRange) ? "bg-gray-800 font-semibold border-gray-800 group hover:bg-stone-200" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
                 {date && (
                   <>
-                    <div className="text-base font-medium">{date.getDate()}</div>
+                    <div className={`text-base font-medium ${
+                      booked && !past 
+                        ? (selected || inRange ? "text-white" : "text-stone-600")
+                        : (selected || inRange ? "text-white group-hover:text-stone-800" : "")
+                    }`}>
+                      {date.getDate()}
+                    </div>
                     {booked && !past && (
                       <svg 
-                        className={`absolute top-1 right-1 w-5 h-5 ${selected || inRange ? "text-white" : "text-red-600"}`}
+                        className={`absolute inset-0 w-full h-full pointer-events-none ${selected || inRange ? "text-white opacity-60" : "text-gray-700 opacity-25"}`}
                         fill="none" 
                         stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                        strokeWidth={3}
+                        viewBox="0 0 100 100"
+                        strokeWidth={1}
+                        preserveAspectRatio="none"
                       >
                         <path 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
-                          d="M6 18L18 6M6 6l12 12" 
+                          d="M15 15 L85 85 M85 15 L15 85" 
                         />
                       </svg>
                     )}
@@ -194,26 +201,33 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                   relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
                   ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-red-600 text-white border-red-700" : "text-stone-400 bg-red-50 border-red-200") : "text-stone-800 hover:bg-stone-100"}
-                  ${!booked && (selected || inRange) ? "bg-stone-800 text-white font-semibold border-stone-800" : ""}
+                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-gray-800 text-white border-gray-800" : "text-stone-400 bg-stone-100 border-stone-300") : "text-stone-800 hover:bg-stone-100"}
+                  ${!booked && (selected || inRange) ? "bg-gray-800 text-white font-semibold border-gray-800" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
                 {date && (
                   <>
-                    <div className="text-base font-medium">{date.getDate()}</div>
+                    <div className={`text-base font-medium ${
+                      booked && !past 
+                        ? (selected || inRange ? "text-white" : "text-stone-600")
+                        : (selected || inRange ? "text-white group-hover:text-stone-800" : "")
+                    }`}>
+                      {date.getDate()}
+                    </div>
                     {booked && !past && (
                       <svg 
-                        className={`absolute top-1 right-1 w-5 h-5 ${selected || inRange ? "text-white" : "text-red-600"}`}
+                        className={`absolute inset-0 w-full h-full pointer-events-none ${selected || inRange ? "text-white opacity-60" : "text-gray-700 opacity-25"}`}
                         fill="none" 
                         stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                        strokeWidth={3}
+                        viewBox="0 0 100 100"
+                        strokeWidth={1}
+                        preserveAspectRatio="none"
                       >
                         <path 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
-                          d="M6 18L18 6M6 6l12 12" 
+                          d="M15 15 L85 85 M85 15 L15 85" 
                         />
                       </svg>
                     )}

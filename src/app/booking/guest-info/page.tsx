@@ -12,8 +12,85 @@ interface GuestFormData {
   lastName: string;
   email: string;
   phone: string;
+  nationality: string;
   notes: string;
 }
+
+// List of countries in Arabic and English (sorted alphabetically, with Syria first)
+const nationalities = [
+  { ar: "سوريا", en: "Syria" }, // Always first
+  // Arab Countries
+  { ar: "الجزائر", en: "Algeria" },
+  { ar: "البحرين", en: "Bahrain" },
+  { ar: "جزر القمر", en: "Comoros" },
+  { ar: "جيبوتي", en: "Djibouti" },
+  { ar: "مصر", en: "Egypt" },
+  { ar: "العراق", en: "Iraq" },
+  { ar: "الأردن", en: "Jordan" },
+  { ar: "الكويت", en: "Kuwait" },
+  { ar: "لبنان", en: "Lebanon" },
+  { ar: "ليبيا", en: "Libya" },
+  { ar: "موريتانيا", en: "Mauritania" },
+  { ar: "المغرب", en: "Morocco" },
+  { ar: "عُمان", en: "Oman" },
+  { ar: "فلسطين", en: "Palestine" },
+  { ar: "قطر", en: "Qatar" },
+  { ar: "السعودية", en: "Saudi Arabia" },
+  { ar: "الصومال", en: "Somalia" },
+  { ar: "السودان", en: "Sudan" },
+  { ar: "تونس", en: "Tunisia" },
+  { ar: "الإمارات العربية المتحدة", en: "United Arab Emirates" },
+  { ar: "اليمن", en: "Yemen" },
+  // European Countries (popular among Syrians)
+  { ar: "النمسا", en: "Austria" },
+  { ar: "بلجيكا", en: "Belgium" },
+  { ar: "الدنمارك", en: "Denmark" },
+  { ar: "فنلندا", en: "Finland" },
+  { ar: "فرنسا", en: "France" },
+  { ar: "ألمانيا", en: "Germany" },
+  { ar: "اليونان", en: "Greece" },
+  { ar: "إيطاليا", en: "Italy" },
+  { ar: "هولندا", en: "Netherlands" },
+  { ar: "النرويج", en: "Norway" },
+  { ar: "بولندا", en: "Poland" },
+  { ar: "إسبانيا", en: "Spain" },
+  { ar: "السويد", en: "Sweden" },
+  { ar: "سويسرا", en: "Switzerland" },
+  { ar: "بريطانيا", en: "United Kingdom" },
+  // Other Countries
+  { ar: "أفغانستان", en: "Afghanistan" },
+  { ar: "الأرجنتين", en: "Argentina" },
+  { ar: "أستراليا", en: "Australia" },
+  { ar: "بنغلاديش", en: "Bangladesh" },
+  { ar: "البرازيل", en: "Brazil" },
+  { ar: "كندا", en: "Canada" },
+  { ar: "تشيلي", en: "Chile" },
+  { ar: "الصين", en: "China" },
+  { ar: "كولومبيا", en: "Colombia" },
+  { ar: "التشيك", en: "Czech Republic" },
+  { ar: "إثيوبيا", en: "Ethiopia" },
+  { ar: "الهند", en: "India" },
+  { ar: "إندونيسيا", en: "Indonesia" },
+  { ar: "إيران", en: "Iran" },
+  { ar: "اليابان", en: "Japan" },
+  { ar: "كينيا", en: "Kenya" },
+  { ar: "كوريا الجنوبية", en: "South Korea" },
+  { ar: "ماليزيا", en: "Malaysia" },
+  { ar: "المكسيك", en: "Mexico" },
+  { ar: "نيجيريا", en: "Nigeria" },
+  { ar: "نيوزيلندا", en: "New Zealand" },
+  { ar: "باكستان", en: "Pakistan" },
+  { ar: "بيرو", en: "Peru" },
+  { ar: "الفلبين", en: "Philippines" },
+  { ar: "روسيا", en: "Russia" },
+  { ar: "سنغافورة", en: "Singapore" },
+  { ar: "جنوب أفريقيا", en: "South Africa" },
+  { ar: "تايلاند", en: "Thailand" },
+  { ar: "تركيا", en: "Turkey" },
+  { ar: "الولايات المتحدة", en: "United States" },
+  { ar: "فيتنام", en: "Vietnam" },
+  { ar: "أخرى", en: "Other" },
+];
 
 interface RoomType {
   id: number;
@@ -47,6 +124,7 @@ function GuestInfoPageContent() {
     lastName: "",
     email: "",
     phone: "",
+    nationality: "",
     notes: "",
   }]);
   const [errors, setErrors] = useState<Array<Partial<GuestFormData>>>([]);
@@ -77,6 +155,7 @@ function GuestInfoPageContent() {
             lastName: "",
             email: "",
             phone: "",
+            nationality: "",
             notes: "",
           }];
           setGuests(initialGuests);
@@ -92,27 +171,6 @@ function GuestInfoPageContent() {
       });
   }, [roomId, startDate, endDate, router]);
 
-  const addGuest = () => {
-    if (room && guests.length < room.roomType.guests) {
-      setGuests([...guests, {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        notes: "",
-      }]);
-      setErrors([...errors, {}]);
-    }
-  };
-
-  const removeGuest = (index: number) => {
-    if (guests.length > 1) {
-      const newGuests = guests.filter((_, i) => i !== index);
-      const newErrors = errors.filter((_, i) => i !== index);
-      setGuests(newGuests);
-      setErrors(newErrors);
-    }
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Array<Partial<GuestFormData>> = guests.map(() => ({}));
@@ -142,6 +200,11 @@ function GuestInfoPageContent() {
         isValid = false;
       } else if (!/^[\d\s\-\+\(\)]+$/.test(guest.phone)) {
         newErrors[index].phone = t("phoneInvalid");
+        isValid = false;
+      }
+
+      if (!guest.nationality.trim()) {
+        newErrors[index].nationality = language === "ar" ? "يجب اختيار الجنسية" : "Nationality is required";
         isValid = false;
       }
     });
@@ -207,29 +270,13 @@ function GuestInfoPageContent() {
       {/* Content */}
       <div className="container mx-auto px-4 pt-4 pb-6">
         <div className="max-w-3xl mx-auto">
-          {/* Guest Information Title */}
-          <h1 className={`text-3xl font-bold text-stone-800 mb-8 text-center font-playfair ${language === "ar" ? "font-cairo" : ""}`}>
-            {t("guestInformation")}
-          </h1>
-          
           <form onSubmit={handleSubmit} className="space-y-8">
             {guests.map((guest, index) => (
               <div key={index} className="bg-stone-100 rounded-lg shadow-lg p-8">
                 <div className={`flex flex-col gap-3 mb-6 ${language === "ar" ? "text-right" : "text-left"}`}>
-                  <div className={`flex items-center justify-between ${language === "ar" ? "flex-row-reverse" : ""}`}>
-                    <h2 className={`text-2xl font-bold text-stone-800 font-playfair ${language === "ar" ? "font-cairo" : ""}`}>
-                      {index === 0 ? t("primaryGuest") : t("additionalGuest")}
-                    </h2>
-                    {guests.length > 1 && index > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => removeGuest(index)}
-                        className="text-red-600 hover:text-red-800 transition-colors text-sm font-semibold"
-                      >
-                        {language === "ar" ? "حذف" : "Remove"}
-                      </button>
-                    )}
-                  </div>
+                  <p className={`text-sm text-stone-600 ${language === "ar" ? "font-cairo" : ""}`}>
+                    {language === "ar" ? "يرجى إضافة معلومات المقيم" : "Please add guest information"}
+                  </p>
                 </div>
 
                 <div className={`space-y-6 ${language === "ar" ? "text-right" : "text-left"}`}>
@@ -341,6 +388,40 @@ function GuestInfoPageContent() {
                     )}
                   </div>
 
+                  {/* Nationality */}
+                  <div>
+                    <label
+                      htmlFor={`nationality-${index}`}
+                      className={`block text-sm font-semibold text-stone-800 mb-2 ${language === "ar" ? "text-right" : "text-left"}`}
+                    >
+                      {language === "ar" ? "الجنسية" : "Nationality"} <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id={`nationality-${index}`}
+                      value={guest.nationality}
+                      onChange={(e) => handleGuestChange(index, "nationality", e.target.value)}
+                      className={`w-full px-4 py-3 border ${
+                        errors[index]?.nationality ? "border-red-500" : "border-stone-300"
+                      } rounded-lg text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-500 ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <option value="">
+                        {language === "ar" ? "اختر الجنسية" : "Select nationality"}
+                      </option>
+                      {nationalities.map((nat, idx) => (
+                        <option key={idx} value={language === "ar" ? nat.ar : nat.en}>
+                          {language === "ar" ? nat.ar : nat.en}
+                        </option>
+                      ))}
+                    </select>
+                    {errors[index]?.nationality && (
+                      <p className={`mt-1 text-sm text-red-500 ${language === "ar" ? "text-right" : "text-left"}`}>
+                        {errors[index].nationality}
+                      </p>
+                    )}
+                  </div>
+
                   {/* Notes - Only for first guest */}
                   {index === 0 && (
                     <div>
@@ -370,19 +451,6 @@ function GuestInfoPageContent() {
               </div>
             ))}
 
-            {/* Add Guest Button - Show after all guest forms */}
-            {room && guests.length < room.roomType.guests && (
-              <div className={`text-center ${language === "ar" ? "text-right" : "text-left"}`}>
-                <button
-                  type="button"
-                  onClick={addGuest}
-                  className={`bg-stone-200 text-stone-800 px-6 py-3 rounded-lg font-semibold hover:bg-stone-300 transition-colors ${language === "ar" ? "font-cairo" : ""}`}
-                >
-                  + {t("addGuest")}
-                </button>
-              </div>
-            )}
-
             {/* Navigation Buttons */}
             <div className={`pt-4 flex gap-4 ${language === "ar" ? "flex-row-reverse" : ""}`}>
               <Link
@@ -394,7 +462,7 @@ function GuestInfoPageContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`flex-1 bg-stone-800 text-white py-4 rounded-lg font-semibold hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`flex-1 bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   language === "ar" ? "font-cairo" : ""
                 }`}
               >

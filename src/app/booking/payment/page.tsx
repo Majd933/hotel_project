@@ -315,7 +315,7 @@ function PaymentPageContent() {
                 </Link>
                 <button
                   type="submit"
-                  className={`flex-1 bg-stone-800 text-white py-4 rounded-lg font-semibold hover:bg-stone-700 transition-colors ${language === "ar" ? "font-cairo" : ""}`}
+                  className={`flex-1 bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors ${language === "ar" ? "font-cairo" : ""}`}
                 >
                   {t("next")}
                 </button>

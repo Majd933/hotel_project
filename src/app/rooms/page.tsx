@@ -23,6 +23,7 @@ export default function RoomsPage() {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({});
   const roomRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
@@ -102,10 +103,10 @@ export default function RoomsPage() {
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Hero Section */}
-      <section className="bg-stone-800 text-white py-20">
+      <section className="bg-stone-800 text-white pt-20 pb-12">
         <div className="container mx-auto px-4">
           <div className={`max-w-3xl mx-auto text-center ${language === "ar" ? "font-cairo" : ""}`}>
-            <h1 className="text-5xl md:text-6xl font-bold mb-4 font-playfair">
+            <h1 className="text-5xl md:text-6xl font-bold mb-3 font-playfair">
               {t("roomsTitle")}
             </h1>
             <p className="text-xl md:text-2xl opacity-90">
@@ -116,7 +117,7 @@ export default function RoomsPage() {
       </section>
 
       {/* Rooms Section */}
-      <section className="container mx-auto px-4 py-8">
+      <section className="container mx-auto px-4 pt-4 pb-8">
         {/* Mobile Index - Show on small screens */}
         <div className={`lg:hidden mb-8 ${language === "ar" ? "text-right" : "text-left"}`}>
           <div className="flex flex-wrap gap-2">
@@ -167,20 +168,57 @@ export default function RoomsPage() {
                 className={`flex flex-col justify-center py-16`}
               >
                 <div className={`grid ${language === "ar" ? "grid-cols-1 lg:grid-cols-[1fr_400px]" : "grid-cols-1 lg:grid-cols-[1fr_400px]"} gap-8 items-start`}>
-                  {/* Center: Room Image */}
+                  {/* Center: Room Image with Navigation */}
                   <div className={`relative ${language === "ar" ? "order-2 lg:order-1" : "order-1"} h-[500px] lg:h-[600px] rounded-lg overflow-hidden bg-stone-200`}>
-                    <Image
-                      src={roomType.image}
-                      alt={t(roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
-                      fill
-                      className="object-cover"
-                      priority={index < 2}
-                      unoptimized={true}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                      }}
-                    />
+                    {/* Generate images for each room type */}
+                    {(() => {
+                      // Define images for each room type (2 images per type)
+                      const roomImages: { [key: string]: string[] } = {
+                        'roomType1': ['/images/rooms/primary-deluxe-room.jpg', '/images/rooms/additional-1-deluxe-room.jpg'],
+                        'roomType2': ['/images/rooms/primary-luxury-suite.jpg', '/images/rooms/additional-1-luxury-suite.jpg'],
+                        'roomType3': ['/images/rooms/primary-presidential-suite.jpg', '/images/rooms/additional-1-presidential-suite.jpg'],
+                        'roomType4': ['/images/rooms/primary-family-room.jpg', '/images/rooms/additional-1-family-room.jpg'],
+                        'roomType5': ['/images/rooms/primary-honeymoon-suite.jpg', '/images/rooms/additional-1-honeymoon-suite.jpg'],
+                      };
+                      
+                      const images = roomImages[roomType.typeKey] || [
+                        `/images/rooms/primary-${roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`,
+                        `/images/rooms/additional-1-${roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`
+                      ];
+                      const currentIndex = currentImageIndex[roomType.id] || 0;
+                      return (
+                        <>
+                          <Image
+                            src={images[currentIndex]}
+                            alt={t(roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                            fill
+                            className="object-cover"
+                            priority={index < 2}
+                            unoptimized={true}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                          
+                          {/* Navigation Dots */}
+                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full">
+                            {images.map((_, imgIndex) => (
+                              <button
+                                key={imgIndex}
+                                onClick={() => setCurrentImageIndex({ ...currentImageIndex, [roomType.id]: imgIndex })}
+                                className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                                  currentIndex === imgIndex 
+                                    ? "bg-stone-800" 
+                                    : "bg-stone-300 hover:bg-stone-400"
+                                }`}
+                                aria-label={`Go to image ${imgIndex + 1}`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {/* Right: Room Details */}
