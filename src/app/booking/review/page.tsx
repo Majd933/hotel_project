@@ -62,6 +62,7 @@ function ReviewPageContent() {
   const endDate = searchParams.get("endDate");
   const currency = (searchParams.get("currency") || "USD") as Currency;
   const guestsParam = searchParams.get("guests");
+  const paymentMethodParam = searchParams.get("paymentMethod");
 
   useEffect(() => {
     if (!roomId || !startDate || !endDate || !currency || !guestsParam) {
@@ -150,6 +151,10 @@ function ReviewPageContent() {
     try {
       const totalPrice = calculateTotalPrice();
       
+      // Get guest name (primary guest: firstName + lastName)
+      const primaryGuest = guests.length > 0 ? guests[0] : null;
+      const guestName = primaryGuest ? `${primaryGuest.firstName} ${primaryGuest.lastName}`.trim() : null;
+      
       // Create booking via API
       const response = await fetch('/api/bookings', {
         method: 'POST',
@@ -162,6 +167,8 @@ function ReviewPageContent() {
           endDate: endDate,
           totalPrice: totalPrice,
           currency: currency,
+          guestName: guestName,
+          paymentMethod: paymentMethodParam || null,
         }),
       });
 

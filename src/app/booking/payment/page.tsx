@@ -122,8 +122,10 @@ function PaymentPageContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigate to review page with all data
-    const reviewUrl = `/booking/review?${searchParams.toString()}`;
+    // Navigate to review page with all data including payment method
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("paymentMethod", paymentMethod);
+    const reviewUrl = `/booking/review?${params.toString()}`;
     router.push(reviewUrl);
   };
 

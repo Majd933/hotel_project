@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,47 +7,46 @@ datasource db {
 }
 
 model RoomType {
-  id          Int       @id @default(autoincrement())
-  typeKey     String    // For translations
-  descKey     String    // For translations
-  price       Int
-  size        Int
-  guests      Int
-  beds        String
-  image       String
-  features    String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  rooms       Room[]
+  id        Int      @id @default(autoincrement())
+  typeKey   String
+  descKey   String
+  price     Int
+  size      Int
+  guests    Int
+  beds      String
+  image     String
+  features  String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rooms     Room[]
 
   @@map("room_types")
 }
 
 model Room {
-  id          Int       @id @default(autoincrement())
-  roomTypeId  Int
-  roomNumber  String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  roomType    RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
-  bookings    Booking[]
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  roomNumber String
+  roomTypeId Int
+  bookings   Booking[]
+  roomType   RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
 
   @@map("rooms")
 }
 
 model Booking {
-  id          Int      @id @default(autoincrement())
-  roomId      Int
-  startDate   DateTime
-  endDate     DateTime
-  totalPrice  Int
-  currency    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  id            Int      @id @default(autoincrement())
+  roomId        Int
+  startDate     DateTime
+  endDate       DateTime
+  totalPrice    Int
+  currency      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  guestName     String?
+  paymentMethod String?
+  room          Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   @@map("bookings")
 }

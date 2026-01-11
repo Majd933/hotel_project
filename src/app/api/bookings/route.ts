@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { roomId, startDate, endDate, totalPrice, currency } = body;
+    const { roomId, startDate, endDate, totalPrice, currency, guestName, paymentMethod } = body;
 
     // Validate required fields
     if (!roomId || !startDate || !endDate || totalPrice === undefined || !currency) {
@@ -95,6 +95,8 @@ export async function POST(request: NextRequest) {
         endDate: end,
         totalPrice,
         currency,
+        guestName: guestName || null,
+        paymentMethod: paymentMethod || null,
       },
       include: {
         room: true
