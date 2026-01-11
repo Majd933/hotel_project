@@ -196,17 +196,6 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                   >
                     {t("facilities")}
                   </Link>
-                  <Link
-                    href="/contact"
-                    onClick={() => setIsPagesDropdownOpen(false)}
-                    className={`block w-full px-4 md:px-5 py-2 md:py-3 transition-colors text-base md:text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isHomePage && !isScrolled
-                        ? "text-white hover:bg-white/20"
-                        : "text-stone-800 hover:bg-stone-100"
-                    }`}
-                  >
-                    {t("contact")}
-                  </Link>
                 </div>
               )}
                 </div>

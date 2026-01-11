@@ -8,7 +8,7 @@ export const translations = {
     about: "من نحن",
     contact: "اتصل بنا",
     restaurants: "المطاعم",
-    facilities: "المرافق",
+    facilities: "المرافق الترفية",
     hotelName: "فندق الشيراتون",
     
     // Home Page
