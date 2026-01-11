@@ -2,13 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
 
 export default function Header({ hideBookButton = false, forceDarkText = false }: { hideBookButton?: boolean; forceDarkText?: boolean }) {
   const { language, toggleLanguage } = useLanguage();
   const pathname = usePathname();
+  const router = useRouter();
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pagesDropdownRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,16 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
   
   // Check if we're on the home page
   const isHomePage = pathname === "/home" || pathname === "/";
+  
+  // Check if we're on admin page
+  const isAdminPage = pathname?.startsWith("/admin");
+  
+  // Handle logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("adminAuthenticated");
+    setIsPagesDropdownOpen(false);
+    router.push("/home");
+  };
   
   // Determine text color: force dark if specified, otherwise use scrolled state
   const textColor = forceDarkText ? "text-stone-800" : (isScrolled ? "text-stone-800" : "text-white");
@@ -207,6 +218,18 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                   >
                     {t("admin")}
                   </Link>
+                  {isAdminPage && (
+                    <button
+                      onClick={handleLogout}
+                      className={`w-full px-4 md:px-5 py-2 md:py-3 transition-colors text-base md:text-lg ${language === "ar" ? "text-right" : "text-left"} ${
+                        isHomePage && !isScrolled
+                          ? "text-white hover:bg-white/20"
+                          : "text-stone-800 hover:bg-stone-100"
+                      }`}
+                    >
+                      {t("logout")}
+                    </button>
+                  )}
                 </div>
               )}
                 </div>
@@ -320,6 +343,18 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                       >
                         {t("admin")}
                       </Link>
+                      {isAdminPage && (
+                        <button
+                          onClick={handleLogout}
+                          className={`block w-full text-left px-4 md:px-5 py-2 md:py-3 transition-colors text-base md:text-lg ${
+                            isHomePage && !isScrolled
+                              ? "text-white hover:bg-white/20"
+                              : "text-stone-800 hover:bg-stone-100"
+                          }`}
+                        >
+                          {t("logout")}
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

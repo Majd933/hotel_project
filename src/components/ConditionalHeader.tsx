@@ -11,9 +11,9 @@ export default function ConditionalHeader() {
     return null;
   }
   
-  // On admin pages: show header with dark text
+  // On admin pages: hide book button
   if (pathname?.startsWith("/admin")) {
-    return <Header forceDarkText={true} />;
+    return <Header hideBookButton={true} />;
   }
   
   // On booking pages: show header with dark text and hide book button

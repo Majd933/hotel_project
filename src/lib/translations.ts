@@ -8,8 +8,9 @@ export const translations = {
     about: "من نحن",
     contact: "اتصل بنا",
     restaurants: "المطاعم",
-    facilities: "المرافق الترفية",
+    facilities: "المرافق الترفيهية",
     admin: "الإدارة",
+    logout: "تسجيل الخروج",
     hotelName: "فندق الشيراتون",
     
     // Home Page
@@ -158,8 +159,9 @@ export const translations = {
     about: "About",
     contact: "Contact",
     restaurants: "Restaurants",
-    facilities: "Facilities",
+    facilities: "Entertainment Facilities",
     admin: "Admin",
+    logout: "Logout",
     hotelName: "Sheraton Hotel",
     
     // Home Page
