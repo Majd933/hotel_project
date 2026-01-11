@@ -9,6 +9,7 @@ export const translations = {
     contact: "اتصل بنا",
     restaurants: "المطاعم",
     facilities: "المرافق الترفية",
+    admin: "الإدارة",
     hotelName: "فندق الشيراتون",
     
     // Home Page
@@ -158,6 +159,7 @@ export const translations = {
     contact: "Contact",
     restaurants: "Restaurants",
     facilities: "Facilities",
+    admin: "Admin",
     hotelName: "Sheraton Hotel",
     
     // Home Page

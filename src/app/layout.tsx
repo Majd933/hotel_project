@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Cairo, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import ConditionalHeader from "@/components/ConditionalHeader";
-import Footer from "@/components/Footer";
+import ConditionalFooter from "@/components/ConditionalFooter";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 
@@ -49,7 +49,7 @@ export default function RootLayout({
             <div className="flex-grow relative" style={{ marginTop: 0, paddingTop: 0 }}>
               {children}
             </div>
-            <Footer />
+            <ConditionalFooter />
           </CurrencyProvider>
         </LanguageProvider>
       </body>
