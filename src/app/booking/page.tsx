@@ -379,10 +379,10 @@ function BookingPageContent() {
               const isRightSwipe = distance < -minSwipeDistance;
 
               setCurrentImageIndex(prevIndex => {
-                if (isLeftSwipe && prevIndex < images.length - 1) {
+                if (isRightSwipe && prevIndex < images.length - 1) {
                   return prevIndex + 1;
                 }
-                if (isRightSwipe && prevIndex > 0) {
+                if (isLeftSwipe && prevIndex > 0) {
                   return prevIndex - 1;
                 }
                 return prevIndex;

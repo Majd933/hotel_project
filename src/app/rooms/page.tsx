@@ -334,10 +334,10 @@ function RoomsPageContent() {
                       ];
                       setCurrentImageIndex(prevIndex => {
                         const currentIndex = prevIndex[roomType.id] || 0;
-                        if (isLeftSwipe && currentIndex < images.length - 1) {
+                        if (isRightSwipe && currentIndex < images.length - 1) {
                           return { ...prevIndex, [roomType.id]: currentIndex + 1 };
                         }
-                        if (isRightSwipe && currentIndex > 0) {
+                        if (isLeftSwipe && currentIndex > 0) {
                           return { ...prevIndex, [roomType.id]: currentIndex - 1 };
                         }
                         return prevIndex;
@@ -379,10 +379,10 @@ function RoomsPageContent() {
                       ];
                       setCurrentImageIndex(prevIndex => {
                         const currentIndex = prevIndex[roomType.id] || 0;
-                        if (isLeftSwipe && currentIndex < images.length - 1) {
+                        if (isRightSwipe && currentIndex < images.length - 1) {
                           return { ...prevIndex, [roomType.id]: currentIndex + 1 };
                         }
-                        if (isRightSwipe && currentIndex > 0) {
+                        if (isLeftSwipe && currentIndex > 0) {
                           return { ...prevIndex, [roomType.id]: currentIndex - 1 };
                         }
                         return prevIndex;
