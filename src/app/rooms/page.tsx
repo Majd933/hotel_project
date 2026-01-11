@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation, getFeatureTranslation } from "@/lib/translations";
 import { useSearchParams } from "next/navigation";
@@ -19,7 +19,7 @@ interface RoomType {
   features: string[];
 }
 
-export default function RoomsPage() {
+function RoomsPageContent() {
   const { language } = useLanguage();
   const searchParams = useSearchParams();
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
@@ -358,5 +358,17 @@ export default function RoomsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function RoomsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-xl text-stone-600">Loading...</div>
+      </div>
+    }>
+      <RoomsPageContent />
+    </Suspense>
   );
 }
