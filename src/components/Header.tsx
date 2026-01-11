@@ -125,7 +125,7 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
 
               {/* Pages Dropdown Menu */}
               {isPagesDropdownOpen && (
-                <div className={`absolute mt-2 w-40 md:w-48 rounded-lg shadow-lg overflow-hidden z-50 ${language === "ar" ? "right-0" : "left-0"} ${
+                <div className={`absolute mt-2 w-40 md:w-48 rounded-lg shadow-lg overflow-hidden z-50 ${language === "ar" ? "left-0" : "left-0"} ${
                   isHomePage && !isScrolled
                     ? "bg-white/10 backdrop-blur-md border border-white/20"
                     : "bg-stone-50 border border-stone-200"
