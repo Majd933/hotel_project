@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -38,7 +38,7 @@ const exchangeRates: Record<Currency, number> = {
   SYP: 13000, // Example rate, update with real rate
 };
 
-export default function BookingPage() {
+function BookingPageContent() {
   const { language } = useLanguage();
   const { currency, setCurrency } = useCurrency();
   const searchParams = useSearchParams();
@@ -488,3 +488,14 @@ export default function BookingPage() {
   );
 }
 
+export default function BookingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-xl text-stone-600">Loading...</div>
+      </div>
+    }>
+      <BookingPageContent />
+    </Suspense>
+  );
+}
