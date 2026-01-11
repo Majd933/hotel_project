@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -66,6 +66,8 @@ function BookingPageContent() {
   const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const touchStartRef = useRef<number | null>(null);
+  const touchEndRef = useRef<number | null>(null);
 
   useEffect(() => {
     fetch('/api/rooms')
@@ -369,15 +371,102 @@ function BookingPageContent() {
               `/images/rooms/primary-${selectedRoom.roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`
             ];
             
+            const minSwipeDistance = 50;
+
+            const handleSwipe = (startX: number, endX: number) => {
+              const distance = startX - endX;
+              const isLeftSwipe = distance > minSwipeDistance;
+              const isRightSwipe = distance < -minSwipeDistance;
+
+              setCurrentImageIndex(prevIndex => {
+                if (isLeftSwipe && prevIndex < images.length - 1) {
+                  return prevIndex + 1;
+                }
+                if (isRightSwipe && prevIndex > 0) {
+                  return prevIndex - 1;
+                }
+                return prevIndex;
+              });
+            };
+
+            const onTouchStart = (e: React.TouchEvent) => {
+              touchEndRef.current = null;
+              touchStartRef.current = e.targetTouches[0].clientX;
+            };
+
+            const onTouchMove = (e: React.TouchEvent) => {
+              touchEndRef.current = e.targetTouches[0].clientX;
+            };
+
+            const onTouchEnd = () => {
+              if (!touchStartRef.current || touchEndRef.current === null) return;
+              handleSwipe(touchStartRef.current, touchEndRef.current);
+            };
+
+            const onMouseDown = (e: React.MouseEvent) => {
+              e.preventDefault();
+              touchEndRef.current = null;
+              touchStartRef.current = e.clientX;
+            };
+
+            const onMouseMove = (e: React.MouseEvent) => {
+              if (touchStartRef.current !== null) {
+                touchEndRef.current = e.clientX;
+              }
+            };
+
+            const onMouseUp = (e: React.MouseEvent) => {
+              e.preventDefault();
+              if (!touchStartRef.current || touchEndRef.current === null) {
+                touchStartRef.current = null;
+                touchEndRef.current = null;
+                return;
+              }
+              handleSwipe(touchStartRef.current, touchEndRef.current);
+              touchStartRef.current = null;
+              touchEndRef.current = null;
+            };
+
+            const onMouseLeave = () => {
+              touchStartRef.current = null;
+              touchEndRef.current = null;
+            };
+
             return (
               <div className={`lg:col-span-1 ${language === "ar" ? "lg:col-start-3" : ""}`}>
-                <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg mb-4">
-                  <Image
-                    src={images[currentImageIndex] || images[0]}
-                    alt={t(selectedRoom.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
-                    fill
-                    className="object-cover"
-                  />
+                <div 
+                  className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg mb-4 cursor-grab active:cursor-grabbing select-none"
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  onMouseDown={onMouseDown}
+                  onMouseMove={onMouseMove}
+                  onMouseUp={onMouseUp}
+                  onMouseLeave={onMouseLeave}
+                  style={{ userSelect: 'none' }}
+                >
+                  <div 
+                    className="flex h-full transition-transform duration-300 ease-in-out"
+                    dir="ltr"
+                    style={{ 
+                      transform: language === "ar" 
+                        ? `translateX(calc(${currentImageIndex} * 100% / ${images.length}))`
+                        : `translateX(calc(-${currentImageIndex} * 100% / ${images.length}))`, 
+                      width: `${images.length * 100}%` 
+                    }}
+                  >
+                    {images.map((imageSrc, imgIndex) => (
+                      <div key={imgIndex} className="relative flex-shrink-0" style={{ width: `calc(100% / ${images.length})`, height: '100%' }}>
+                        <Image
+                          src={imageSrc}
+                          draggable={false}
+                          alt={t(selectedRoom.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
                   
                   {/* Navigation Dots */}
                   {images.length > 1 && (

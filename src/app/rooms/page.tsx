@@ -26,6 +26,8 @@ function RoomsPageContent() {
   const [loading, setLoading] = useState(true);
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({});
+  const touchStartRef = useRef<{ [key: number]: number | null }>({});
+  const touchEndRef = useRef<{ [key: number]: number | null }>({});
   
   // --- التغيير 1: إضافة متغيرات الحالة الخاصة بالهندسة ---
   const [sidebarMaxHeight, setSidebarMaxHeight] = useState<string>('100vh');
@@ -301,7 +303,98 @@ function RoomsPageContent() {
               >
                 <div className={`grid ${language === "ar" ? "grid-cols-1 lg:grid-cols-[1fr_400px]" : "grid-cols-1 lg:grid-cols-[1fr_400px]"} gap-8 items-start`}>
                   {/* Center: Room Image with Navigation */}
-                  <div className={`relative ${language === "ar" ? "order-2 lg:order-1" : "order-1"} h-[500px] lg:h-[600px] rounded-lg overflow-hidden bg-stone-200`}>
+                  <div 
+                    className={`relative ${language === "ar" ? "order-2 lg:order-1" : "order-1"} h-[500px] lg:h-[600px] rounded-lg overflow-hidden bg-stone-200 cursor-grab active:cursor-grabbing select-none`}
+                    style={{ userSelect: 'none' }}
+                    onTouchStart={(e) => {
+                      touchEndRef.current[roomType.id] = null;
+                      touchStartRef.current[roomType.id] = e.targetTouches[0].clientX;
+                    }}
+                    onTouchMove={(e) => {
+                      touchEndRef.current[roomType.id] = e.targetTouches[0].clientX;
+                    }}
+                    onTouchEnd={() => {
+                      const start = touchStartRef.current[roomType.id];
+                      const end = touchEndRef.current[roomType.id];
+                      if (!start || end === null || end === undefined) return;
+                      const minSwipeDistance = 50;
+                      const distance = start - end;
+                      const isLeftSwipe = distance > minSwipeDistance;
+                      const isRightSwipe = distance < -minSwipeDistance;
+                      const roomImages: { [key: string]: string[] } = {
+                        'roomType1': ['/images/rooms/primary-deluxe-room.jpg', '/images/rooms/additional-1-deluxe-room.jpg'],
+                        'roomType2': ['/images/rooms/primary-luxury-suite.jpg', '/images/rooms/additional-1-luxury-suite.jpg'],
+                        'roomType3': ['/images/rooms/primary-presidential-suite.jpg', '/images/rooms/additional-1-presidential-suite.jpg'],
+                        'roomType4': ['/images/rooms/primary-family-room.jpg', '/images/rooms/additional-1-family-room.jpg'],
+                        'roomType5': ['/images/rooms/primary-honeymoon-suite.jpg', '/images/rooms/additional-1-honeymoon-suite.jpg'],
+                      };
+                      const images = roomImages[roomType.typeKey] || [
+                        `/images/rooms/primary-${roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`,
+                        `/images/rooms/additional-1-${roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`
+                      ];
+                      setCurrentImageIndex(prevIndex => {
+                        const currentIndex = prevIndex[roomType.id] || 0;
+                        if (isLeftSwipe && currentIndex < images.length - 1) {
+                          return { ...prevIndex, [roomType.id]: currentIndex + 1 };
+                        }
+                        if (isRightSwipe && currentIndex > 0) {
+                          return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                        }
+                        return prevIndex;
+                      });
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      touchEndRef.current[roomType.id] = null;
+                      touchStartRef.current[roomType.id] = e.clientX;
+                    }}
+                    onMouseMove={(e) => {
+                      if (touchStartRef.current[roomType.id] !== null && touchStartRef.current[roomType.id] !== undefined) {
+                        touchEndRef.current[roomType.id] = e.clientX;
+                      }
+                    }}
+                    onMouseUp={(e) => {
+                      e.preventDefault();
+                      const start = touchStartRef.current[roomType.id];
+                      const end = touchEndRef.current[roomType.id];
+                      if (!start || end === null || end === undefined) {
+                        touchStartRef.current[roomType.id] = null;
+                        touchEndRef.current[roomType.id] = null;
+                        return;
+                      }
+                      const minSwipeDistance = 50;
+                      const distance = start - end;
+                      const isLeftSwipe = distance > minSwipeDistance;
+                      const isRightSwipe = distance < -minSwipeDistance;
+                      const roomImages: { [key: string]: string[] } = {
+                        'roomType1': ['/images/rooms/primary-deluxe-room.jpg', '/images/rooms/additional-1-deluxe-room.jpg'],
+                        'roomType2': ['/images/rooms/primary-luxury-suite.jpg', '/images/rooms/additional-1-luxury-suite.jpg'],
+                        'roomType3': ['/images/rooms/primary-presidential-suite.jpg', '/images/rooms/additional-1-presidential-suite.jpg'],
+                        'roomType4': ['/images/rooms/primary-family-room.jpg', '/images/rooms/additional-1-family-room.jpg'],
+                        'roomType5': ['/images/rooms/primary-honeymoon-suite.jpg', '/images/rooms/additional-1-honeymoon-suite.jpg'],
+                      };
+                      const images = roomImages[roomType.typeKey] || [
+                        `/images/rooms/primary-${roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`,
+                        `/images/rooms/additional-1-${roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`
+                      ];
+                      setCurrentImageIndex(prevIndex => {
+                        const currentIndex = prevIndex[roomType.id] || 0;
+                        if (isLeftSwipe && currentIndex < images.length - 1) {
+                          return { ...prevIndex, [roomType.id]: currentIndex + 1 };
+                        }
+                        if (isRightSwipe && currentIndex > 0) {
+                          return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                        }
+                        return prevIndex;
+                      });
+                      touchStartRef.current[roomType.id] = null;
+                      touchEndRef.current[roomType.id] = null;
+                    }}
+                    onMouseLeave={() => {
+                      touchStartRef.current[roomType.id] = null;
+                      touchEndRef.current[roomType.id] = null;
+                    }}
+                  >
                     {/* Image Logic... (نفس كودك تماماً) */}
                     {(() => {
                       const roomImages: { [key: string]: string[] } = {
@@ -319,18 +412,34 @@ function RoomsPageContent() {
                       const currentIndex = currentImageIndex[roomType.id] || 0;
                       return (
                         <>
-                          <Image
-                            src={images[currentIndex]}
-                            alt={t(roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
-                            fill
-                            className="object-cover"
-                            priority={index < 2}
-                            unoptimized={true}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = "none";
+                          <div 
+                            className="flex h-full transition-transform duration-300 ease-in-out"
+                            dir="ltr"
+                            style={{ 
+                              transform: language === "ar"
+                                ? `translateX(calc(${currentIndex} * 100% / ${images.length}))`
+                                : `translateX(calc(-${currentIndex} * 100% / ${images.length}))`, 
+                              width: `${images.length * 100}%` 
                             }}
-                          />
+                          >
+                            {images.map((imageSrc, imgIndex) => (
+                              <div key={imgIndex} className="relative flex-shrink-0" style={{ width: `calc(100% / ${images.length})`, height: '100%' }}>
+                                <Image
+                                  src={imageSrc}
+                                  alt={t(roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                                  fill
+                                  className="object-cover"
+                                  priority={index < 2 && imgIndex === 0}
+                                  unoptimized={true}
+                                  draggable={false}
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = "none";
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
                           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full">
                             {images.map((_, imgIndex) => (
                               <button

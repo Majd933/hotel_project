@@ -41,6 +41,7 @@ export default function RootLayout({
     <html lang="ar" dir="rtl">
       <body
         className={`${playfairDisplay.variable} ${cairo.variable} ${ibmPlexSans.variable} antialiased flex flex-col min-h-screen`}
+        suppressHydrationWarning
       >
         <LanguageProvider>
           <CurrencyProvider>
