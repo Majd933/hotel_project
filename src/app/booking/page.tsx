@@ -355,7 +355,7 @@ function BookingPageContent() {
 
       {/* Calendar Section */}
       <div className="container mx-auto px-4 pt-4 pb-12">
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${language === "ar" ? "lg:grid-flow-col-dense" : ""}`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8`}>
           {/* Room Image - Left Side (1/3 max) */}
           {selectedRoom && (() => {
             // Define images for each room type (2 images per type)
@@ -375,15 +375,28 @@ function BookingPageContent() {
 
             const handleSwipe = (startX: number, endX: number) => {
               const distance = startX - endX;
-              const isLeftSwipe = distance > minSwipeDistance;
-              const isRightSwipe = distance < -minSwipeDistance;
+              const isLeftSwipe = distance > minSwipeDistance; // Swipe from right to left
+              const isRightSwipe = distance < -minSwipeDistance; // Swipe from left to right
 
               setCurrentImageIndex(prevIndex => {
-                if (isRightSwipe && prevIndex < images.length - 1) {
-                  return prevIndex + 1;
-                }
-                if (isLeftSwipe && prevIndex > 0) {
-                  return prevIndex - 1;
+                if (language === "ar") {
+                  // Arabic (RTL): left to right swipe → next image
+                  if (isRightSwipe && prevIndex < images.length - 1) {
+                    return prevIndex + 1;
+                  }
+                  // Arabic (RTL): right to left swipe → previous image
+                  if (isLeftSwipe && prevIndex > 0) {
+                    return prevIndex - 1;
+                  }
+                } else {
+                  // English (LTR): right to left swipe → next image
+                  if (isLeftSwipe && prevIndex < images.length - 1) {
+                    return prevIndex + 1;
+                  }
+                  // English (LTR): left to right swipe → previous image
+                  if (isRightSwipe && prevIndex > 0) {
+                    return prevIndex - 1;
+                  }
                 }
                 return prevIndex;
               });
@@ -433,7 +446,7 @@ function BookingPageContent() {
             };
 
             return (
-              <div className={`lg:col-span-1 ${language === "ar" ? "lg:col-start-3" : ""}`}>
+              <div className="lg:col-span-1">
                 <div 
                   className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg mb-4 cursor-grab active:cursor-grabbing select-none"
                   onTouchStart={onTouchStart}
@@ -499,7 +512,7 @@ function BookingPageContent() {
           })()}
 
           {/* Calendar - Right Side (2/3) */}
-          <div className={`lg:col-span-2 ${language === "ar" && selectedRoom ? "lg:col-start-1" : ""}`}>
+          <div className="lg:col-span-2">
             <BookingCalendar
               onDateSelect={handleDateSelect}
               selectedDates={selectedDates}

@@ -334,11 +334,24 @@ function RoomsPageContent() {
                       ];
                       setCurrentImageIndex(prevIndex => {
                         const currentIndex = prevIndex[roomType.id] || 0;
-                        if (isRightSwipe && currentIndex < images.length - 1) {
-                          return { ...prevIndex, [roomType.id]: currentIndex + 1 };
-                        }
-                        if (isLeftSwipe && currentIndex > 0) {
-                          return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                        if (language === "ar") {
+                          // Arabic (RTL): left to right swipe → next image
+                          if (isRightSwipe && currentIndex < images.length - 1) {
+                            return { ...prevIndex, [roomType.id]: currentIndex + 1 };
+                          }
+                          // Arabic (RTL): right to left swipe → previous image
+                          if (isLeftSwipe && currentIndex > 0) {
+                            return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                          }
+                        } else {
+                          // English (LTR): right to left swipe → next image
+                          if (isLeftSwipe && currentIndex < images.length - 1) {
+                            return { ...prevIndex, [roomType.id]: currentIndex + 1 };
+                          }
+                          // English (LTR): left to right swipe → previous image
+                          if (isRightSwipe && currentIndex > 0) {
+                            return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                          }
                         }
                         return prevIndex;
                       });
@@ -364,8 +377,8 @@ function RoomsPageContent() {
                       }
                       const minSwipeDistance = 50;
                       const distance = start - end;
-                      const isLeftSwipe = distance > minSwipeDistance;
-                      const isRightSwipe = distance < -minSwipeDistance;
+                      const isLeftSwipe = distance > minSwipeDistance; // Swipe from right to left
+                      const isRightSwipe = distance < -minSwipeDistance; // Swipe from left to right
                       const roomImages: { [key: string]: string[] } = {
                         'roomType1': ['/images/rooms/primary-deluxe-room.jpg', '/images/rooms/additional-1-deluxe-room.jpg'],
                         'roomType2': ['/images/rooms/primary-luxury-suite.jpg', '/images/rooms/additional-1-luxury-suite.jpg'],
@@ -379,11 +392,24 @@ function RoomsPageContent() {
                       ];
                       setCurrentImageIndex(prevIndex => {
                         const currentIndex = prevIndex[roomType.id] || 0;
-                        if (isRightSwipe && currentIndex < images.length - 1) {
-                          return { ...prevIndex, [roomType.id]: currentIndex + 1 };
-                        }
-                        if (isLeftSwipe && currentIndex > 0) {
-                          return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                        if (language === "ar") {
+                          // Arabic (RTL): left to right swipe → next image
+                          if (isRightSwipe && currentIndex < images.length - 1) {
+                            return { ...prevIndex, [roomType.id]: currentIndex + 1 };
+                          }
+                          // Arabic (RTL): right to left swipe → previous image
+                          if (isLeftSwipe && currentIndex > 0) {
+                            return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                          }
+                        } else {
+                          // English (LTR): right to left swipe → next image
+                          if (isLeftSwipe && currentIndex < images.length - 1) {
+                            return { ...prevIndex, [roomType.id]: currentIndex + 1 };
+                          }
+                          // English (LTR): left to right swipe → previous image
+                          if (isRightSwipe && currentIndex > 0) {
+                            return { ...prevIndex, [roomType.id]: currentIndex - 1 };
+                          }
                         }
                         return prevIndex;
                       });

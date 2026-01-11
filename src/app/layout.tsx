@@ -45,10 +45,10 @@ export default function RootLayout({
       >
         <LanguageProvider>
           <CurrencyProvider>
-            <ConditionalHeader />
-            <div className="flex-grow relative" style={{ marginTop: 0, paddingTop: 0 }}>
-              {children}
-            </div>
+          <ConditionalHeader />
+          <div className="flex-grow relative" style={{ marginTop: 0, paddingTop: 0 }}>
+            {children}
+          </div>
             <ConditionalFooter />
           </CurrencyProvider>
         </LanguageProvider>

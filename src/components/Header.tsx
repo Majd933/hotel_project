@@ -85,16 +85,16 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
           {/* Booking Button */}
           <div className="flex items-center">
             {!hideBookButton && (
-              <Link
-                href="/booking"
-                className={`px-6 py-2.5 rounded-lg font-semibold transition-all text-lg ${
-                  isScrolled
-                    ? "bg-stone-800 text-stone-50 hover:bg-stone-700"
-                    : "bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white/20"
-                }`}
-              >
-                {t("bookNow")}
-              </Link>
+            <Link
+              href="/booking"
+              className={`px-6 py-2.5 rounded-lg font-semibold transition-all text-lg ${
+                isScrolled
+                  ? "bg-stone-800 text-stone-50 hover:bg-stone-700"
+                  : "bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white/20"
+              }`}
+            >
+              {t("bookNow")}
+            </Link>
             )}
           </div>
 
