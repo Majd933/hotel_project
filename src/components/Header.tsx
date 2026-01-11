@@ -2,16 +2,21 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
 
 export default function Header({ hideBookButton = false, forceDarkText = false }: { hideBookButton?: boolean; forceDarkText?: boolean }) {
   const { language, toggleLanguage } = useLanguage();
+  const pathname = usePathname();
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pagesDropdownRef = useRef<HTMLDivElement>(null);
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
     getTranslation(language, key);
+  
+  // Check if we're on the home page
+  const isHomePage = pathname === "/home" || pathname === "/";
   
   // Determine text color: force dark if specified, otherwise use scrolled state
   const textColor = forceDarkText ? "text-stone-800" : (isScrolled ? "text-stone-800" : "text-white");
@@ -121,17 +126,17 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
               {/* Pages Dropdown Menu */}
               {isPagesDropdownOpen && (
                 <div className={`absolute mt-2 w-48 rounded-lg shadow-lg overflow-hidden ${language === "ar" ? "right-0" : "left-0"} ${
-                  isScrolled 
-                    ? "bg-stone-50 border border-stone-200" 
-                    : "bg-white/10 backdrop-blur-md border border-white/20"
+                  isHomePage && !isScrolled
+                    ? "bg-white/10 backdrop-blur-md border border-white/20"
+                    : "bg-stone-50 border border-stone-200"
                 }`}>
                   <Link
                     href="/home"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("home")}
@@ -140,9 +145,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     href="/rooms"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("rooms")}
@@ -151,9 +156,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     href="/booking"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("booking")}
@@ -162,9 +167,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     href="/about"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("about")}
@@ -173,9 +178,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     href="/restaurants"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("restaurants")}
@@ -184,9 +189,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     href="/facilities"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("facilities")}
@@ -195,9 +200,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     href="/contact"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
-                      isScrolled 
-                        ? "text-stone-800 hover:bg-stone-100" 
-                        : "text-white hover:bg-white/20"
+                      isHomePage && !isScrolled
+                        ? "text-white hover:bg-white/20"
+                        : "text-stone-800 hover:bg-stone-100"
                     }`}
                   >
                     {t("contact")}
@@ -234,17 +239,17 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                   {/* Pages Dropdown Menu */}
                   {isPagesDropdownOpen && (
                     <div className={`absolute left-0 mt-2 w-48 rounded-lg shadow-lg overflow-hidden ${
-                      isScrolled 
-                        ? "bg-stone-50 border border-stone-200" 
-                        : "bg-white/10 backdrop-blur-md border border-white/20"
+                      isHomePage && !isScrolled
+                        ? "bg-white/10 backdrop-blur-md border border-white/20"
+                        : "bg-stone-50 border border-stone-200"
                     }`}>
                       <Link
                         href="/home"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("home")}
@@ -253,9 +258,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         href="/rooms"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("rooms")}
@@ -264,9 +269,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         href="/booking"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("booking")}
@@ -275,9 +280,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         href="/about"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("about")}
@@ -286,9 +291,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         href="/restaurants"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("restaurants")}
@@ -297,9 +302,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         href="/facilities"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("facilities")}
@@ -308,9 +313,9 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         href="/contact"
                         onClick={() => setIsPagesDropdownOpen(false)}
                         className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
-                          isScrolled 
-                            ? "text-stone-800 hover:bg-stone-100" 
-                            : "text-white hover:bg-white/20"
+                          isHomePage && !isScrolled
+                            ? "text-white hover:bg-white/20"
+                            : "text-stone-800 hover:bg-stone-100"
                         }`}
                       >
                         {t("contact")}
