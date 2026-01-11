@@ -23,20 +23,6 @@ export default function HomePage() {
             <p className="text-2xl md:text-3xl mb-12 opacity-95 font-light">
               {t("welcomeSubtitle")}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/rooms"
-                className="bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 rounded-sm font-semibold hover:bg-white/20 transition-all text-lg"
-              >
-                {t("exploreRooms")}
-              </Link>
-              <Link
-                href="/booking"
-                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-sm font-semibold hover:bg-white hover:text-stone-800 transition-all text-lg"
-              >
-                {t("bookNow")}
-              </Link>
-            </div>
           </div>
         </div>
       </HeroWithHeader>
