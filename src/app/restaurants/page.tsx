@@ -11,7 +11,7 @@ export default function RestaurantsPage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <section className="bg-stone-800 text-white py-20">
+      <section className="bg-stone-800 text-white py-25">
         <div className="container mx-auto px-4">
           <h1 className={`text-5xl font-bold text-center ${language === "ar" ? "font-cairo" : "font-playfair"}`}>
             {language === "ar" ? "المطاعم" : "Restaurants"}

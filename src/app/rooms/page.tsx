@@ -27,8 +27,14 @@ function RoomsPageContent() {
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({});
   
-  // Ref لمنع التكرار وللتحكم في التمرير الأولي
+  // --- التغيير 1: إضافة متغيرات الحالة الخاصة بالهندسة ---
+  const [sidebarMaxHeight, setSidebarMaxHeight] = useState<string>('100vh');
+  const [sidebarTopMargin, setSidebarTopMargin] = useState<string>('0px');
+
+  // --- التغيير 2: إضافة Refs للوصول للعناصر وقياسها ---
   const initialScrollDone = useRef(false);
+  const sidebarContentRef = useRef<HTMLDivElement>(null); // لقياس طول الفهرس
+  const roomRefs = useRef<{ [key: number]: HTMLDivElement | null }>({}); // للوصول للغرف
 
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
     getTranslation(language, key);
@@ -48,17 +54,15 @@ function RoomsPageContent() {
             const roomType = data.find(rt => rt.id === roomTypeId);
             if (roomType) {
               setSelectedRoomTypeId(roomTypeId);
-              // ملاحظة: نترك initialScrollDone = false لكي نسمح بالتمرير
             } else if (data.length > 0) {
               setSelectedRoomTypeId(data[0].id);
-              initialScrollDone.current = true; // لا تمرر تلقائياً إذا الرابط خطأ
+              initialScrollDone.current = true;
             }
           } else {
-            // إذا دخل الصفحة بدون باراميتر
             if (data.length > 0) {
               setSelectedRoomTypeId(data[0].id);
             }
-            initialScrollDone.current = true; // لا تمرر تلقائياً
+            initialScrollDone.current = true;
           }
         } else {
           console.error('Invalid data format:', data);
@@ -73,18 +77,16 @@ function RoomsPageContent() {
       });
   }, [searchParams]);
 
-  // 2. منطق التمرير التلقائي عند فتح الصفحة (الحل الجديد)
+  // 2. منطق التمرير التلقائي عند فتح الصفحة
   useEffect(() => {
-    // الشرط: التحميل انتهى، البيانات موجودة، تم اختيار غرفة، ولم نمرر بعد
     if (!loading && roomTypes.length > 0 && selectedRoomTypeId !== null && !initialScrollDone.current) {
       
       const targetId = `room-type-${selectedRoomTypeId}`;
       const element = document.getElementById(targetId);
 
       if (element) {
-        // تأخير بسيط جداً للسماح للصور والعناصر بأخذ حجمها
         setTimeout(() => {
-          const headerHeight = 100; // ارتفاع الهيدر لديك
+          const headerHeight = 100;
           const rect = element.getBoundingClientRect();
           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
           const elementTop = rect.top + scrollTop;
@@ -95,19 +97,75 @@ function RoomsPageContent() {
             behavior: "smooth"
           });
 
-          // نضع علامة أننا انتهينا من التمرير الأولي
           initialScrollDone.current = true;
         }, 300);
       }
     }
   }, [loading, roomTypes, selectedRoomTypeId]);
 
+  // --- التغيير 3: منطق حساب ارتفاع وموقع الفهرس الجديد ---
+  useEffect(() => {
+    if (!loading && roomTypes.length > 0) {
+      
+      const calculateSidebarGeometry = () => {
+        const firstRoomId = roomTypes[0].id;
+        const lastRoomId = roomTypes[roomTypes.length - 1].id;
+        
+        // استخدام Refs بدلاً من getElementById للدقة
+        const firstRoomEl = roomRefs.current[firstRoomId];
+        const lastRoomEl = roomRefs.current[lastRoomId];
+        const sidebarContent = sidebarContentRef.current;
 
-  // 3. وظيفة التمرير اليدوي (عند الضغط على الأزرار)
+        if (firstRoomEl && lastRoomEl && sidebarContent) {
+          // نبحث عن حاوية الصورة (relative) لأنها المقياس الدقيق
+          const firstImgContainer = firstRoomEl.querySelector('.relative') as HTMLElement;
+          const lastImgContainer = lastRoomEl.querySelector('.relative') as HTMLElement;
+
+          if (firstImgContainer && lastImgContainer) {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 1. مركز الصورة الأولى
+            const firstRect = firstImgContainer.getBoundingClientRect();
+            const firstImgCenterY = (firstRect.top + scrollTop) + (firstRect.height / 2);
+
+            // 2. مركز الصورة الأخيرة
+            const lastRect = lastImgContainer.getBoundingClientRect();
+            const lastImgCenterY = (lastRect.top + scrollTop) + (lastRect.height / 2);
+
+            // 3. ارتفاع محتوى الفهرس
+            const contentHeight = sidebarContent.getBoundingClientRect().height;
+
+            // 4. حساب هامش البداية (لضبط المنتصف مع المنتصف)
+            const sectionContainer = document.querySelector('section.container') as HTMLElement;
+            const sectionTop = sectionContainer ? (sectionContainer.getBoundingClientRect().top + scrollTop) : 0;
+            
+            const desiredStart = firstImgCenterY - (contentHeight / 2);
+            const calculatedMargin = Math.max(0, desiredStart - sectionTop);
+
+            // 5. حساب الارتفاع الكلي للمسار
+            const travelDistance = lastImgCenterY - firstImgCenterY;
+            const calculatedHeight = travelDistance + contentHeight;
+
+            setSidebarTopMargin(`${calculatedMargin}px`);
+            setSidebarMaxHeight(`${calculatedHeight}px`);
+          }
+        }
+      };
+
+      const timer = setTimeout(calculateSidebarGeometry, 500);
+      window.addEventListener('resize', calculateSidebarGeometry);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', calculateSidebarGeometry);
+      };
+    }
+  }, [loading, roomTypes]);
+
+
+  // 3. وظيفة التمرير اليدوي
   const scrollToRoom = (roomTypeId: number) => {
     setSelectedRoomTypeId(roomTypeId);
     
-    // تأخير بسيط جداً لضمان تحديث الـ State قبل الحركة
     requestAnimationFrame(() => {
         const roomElement = document.getElementById(`room-type-${roomTypeId}`);
         if (roomElement) {
@@ -124,19 +182,18 @@ function RoomsPageContent() {
     });
   };
 
-  // 4. تحديث الغرفة المختارة في القائمة الجانبية عند التمرير اليدوي للمستخدم
+  // 4. تحديث الغرفة المختارة عند التمرير
   useEffect(() => {
     const handleScroll = () => {
-      // إذا كان التمرير التلقائي لا يزال جارياً، لا تفعل شيئاً لتجنب التعارض
       if (!initialScrollDone.current && searchParams.get('roomTypeId')) return;
 
       let currentSelectedId: number | null = null;
       
       for (const roomType of roomTypes) {
+        // نستخدم الـ refs هنا أيضاً للأداء الأفضل، أو نبقيها كما هي
         const el = document.getElementById(`room-type-${roomType.id}`);
         if (el) {
           const rect = el.getBoundingClientRect();
-          // المنطق: إذا كانت الغرفة في منتصف الشاشة تقريباً
           if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
             currentSelectedId = roomType.id;
             break;
@@ -150,7 +207,7 @@ function RoomsPageContent() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // استدعاء أولي
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [roomTypes, selectedRoomTypeId, searchParams]);
 
@@ -164,11 +221,10 @@ function RoomsPageContent() {
     );
   }
 
-  // --- JSX (نفس التصميم الأصلي تماماً) ---
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Hero Section */}
-      <section className="bg-stone-800 text-white pt-20 pb-12">
+      <section className="bg-stone-800 text-white pt-25 pb-12">
         <div className="container mx-auto px-4">
           <div className={`max-w-3xl mx-auto text-center ${language === "ar" ? "font-cairo" : ""}`}>
             <h1 className="text-5xl md:text-6xl font-bold mb-3 font-playfair">
@@ -182,8 +238,8 @@ function RoomsPageContent() {
       </section>
 
       {/* Rooms Section */}
-      <section className="container mx-auto px-4 pt-4 pb-8">
-        {/* Mobile Index - Show on small screens */}
+      <section className="container mx-auto px-4 pt-4 pb-8 relative">
+        {/* Mobile Index */}
         <div className={`lg:hidden mb-8 ${language === "ar" ? "text-right" : "text-left"}`}>
           <div className="flex flex-wrap gap-2">
             {roomTypes.map((roomType) => (
@@ -201,9 +257,20 @@ function RoomsPageContent() {
         </div>
 
         <div className={`grid ${language === "ar" ? "grid-cols-1 lg:grid-cols-[300px_1fr_400px]" : "grid-cols-1 lg:grid-cols-[300px_1fr_400px]"} gap-8`}>
-          {/* Left: Room Type List / Index - Fixed */}
-          <div className={`hidden lg:block ${language === "ar" ? "order-3 lg:order-1" : "order-1"}`} style={{ height: '380vh' }}>
-            <div className={`sticky top-[65vh] -translate-y-1/2 h-fit space-y-1 ${language === "ar" ? "text-right" : "text-left"}`}>
+          
+          {/* --- التغيير 4: تطبيق الستايل الديناميكي على حاوية الفهرس --- */}
+          <div 
+            className={`hidden lg:block ${language === "ar" ? "order-3 lg:order-1" : "order-1"}`} 
+            style={{ 
+                height: sidebarMaxHeight, 
+                marginTop: sidebarTopMargin 
+            }}
+          >
+            {/* --- التغيير 5: إضافة Ref لمحتوى الفهرس --- */}
+            <div 
+                ref={sidebarContentRef}
+                className={`sticky top-[50vh] -translate-y-1/2 h-fit space-y-1 ${language === "ar" ? "text-right" : "text-left"}`}
+            >
               {roomTypes.map((roomType) => (
                 <button
                   key={roomType.id}
@@ -228,14 +295,15 @@ function RoomsPageContent() {
               <div
                 key={roomType.id}
                 id={`room-type-${roomType.id}`}
+                // --- التغيير 6: ربط العنصر بـ roomRefs ---
+                ref={(el) => { if (el) roomRefs.current[roomType.id] = el; }}
                 className={`flex flex-col justify-center py-16`}
               >
                 <div className={`grid ${language === "ar" ? "grid-cols-1 lg:grid-cols-[1fr_400px]" : "grid-cols-1 lg:grid-cols-[1fr_400px]"} gap-8 items-start`}>
                   {/* Center: Room Image with Navigation */}
                   <div className={`relative ${language === "ar" ? "order-2 lg:order-1" : "order-1"} h-[500px] lg:h-[600px] rounded-lg overflow-hidden bg-stone-200`}>
-                    {/* Generate images for each room type */}
+                    {/* Image Logic... (نفس كودك تماماً) */}
                     {(() => {
-                      // Define images for each room type (2 images per type)
                       const roomImages: { [key: string]: string[] } = {
                         'roomType1': ['/images/rooms/primary-deluxe-room.jpg', '/images/rooms/additional-1-deluxe-room.jpg'],
                         'roomType2': ['/images/rooms/primary-luxury-suite.jpg', '/images/rooms/additional-1-luxury-suite.jpg'],
@@ -263,8 +331,6 @@ function RoomsPageContent() {
                               target.style.display = "none";
                             }}
                           />
-                          
-                          {/* Navigation Dots */}
                           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full">
                             {images.map((_, imgIndex) => (
                               <button
@@ -295,7 +361,6 @@ function RoomsPageContent() {
                       </p>
                     </div>
 
-                    {/* Room Specifications */}
                     <div className={`flex ${language === "ar" ? "flex-row-reverse justify-end" : "justify-start"} items-center gap-8 pb-6 border-b border-stone-200`}>
                       <div>
                         <div className={`text-2xl font-light text-stone-800 ${language === "ar" ? "font-cairo" : ""}`}>
@@ -316,7 +381,6 @@ function RoomsPageContent() {
                       </div>
                     </div>
 
-                    {/* Features */}
                     <div>
                       <h3 className={`text-xl font-light text-stone-800 mb-4 ${language === "ar" ? "font-cairo" : ""}`}>
                         {t("roomFeatures")}
@@ -333,7 +397,6 @@ function RoomsPageContent() {
                       </div>
                     </div>
 
-                    {/* Price and CTA */}
                     <div className={`pt-6 border-t border-stone-200 ${language === "ar" ? "text-right" : "text-left"}`}>
                       <div className={`mb-6 ${language === "ar" ? "font-cairo" : ""}`}>
                         <span className="text-4xl font-light text-stone-800">
