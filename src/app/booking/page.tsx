@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { useCurrency } from "@/context/CurrencyContext";
 import { getTranslation } from "@/lib/translations";
 import BookingCalendar from "@/components/BookingCalendar";
 import BookingTimeline from "@/components/BookingTimeline";
@@ -38,6 +40,8 @@ const exchangeRates: Record<Currency, number> = {
 
 export default function BookingPage() {
   const { language } = useLanguage();
+  const { currency, setCurrency } = useCurrency();
+  const searchParams = useSearchParams();
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
     getTranslation(language, key);
 
@@ -47,11 +51,11 @@ export default function BookingPage() {
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [selectedRoomType, setSelectedRoomType] = useState<string | null>(null);
-  const [currency, setCurrency] = useState<Currency>("USD");
   const [loading, setLoading] = useState(true);
   const [availability, setAvailability] = useState<Record<string, { total: number; available: number; rooms: Room[] }>>({});
   const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   useEffect(() => {
     fetch('/api/rooms')
@@ -71,9 +75,27 @@ export default function BookingPage() {
         setRoomTypes(uniqueTypes);
         setAvailableRooms(uniqueTypes);
         
-        if (uniqueTypes.length > 0) {
-          setSelectedRoomType(uniqueTypes[0].roomType.typeKey);
-          setSelectedRoomId(uniqueTypes[0].id);
+        // Check if roomTypeId is in URL params
+        const roomTypeIdParam = searchParams.get('roomTypeId');
+        if (roomTypeIdParam) {
+          const roomTypeId = parseInt(roomTypeIdParam, 10);
+          const roomWithType = uniqueTypes.find(r => r.roomType.id === roomTypeId);
+          if (roomWithType) {
+            setSelectedRoomType(roomWithType.roomType.typeKey);
+            setSelectedRoomId(roomWithType.id);
+          } else {
+            // Fallback to first room if type not found
+            if (uniqueTypes.length > 0) {
+              setSelectedRoomType(uniqueTypes[0].roomType.typeKey);
+              setSelectedRoomId(uniqueTypes[0].id);
+            }
+          }
+        } else {
+          // Default to first room type
+          if (uniqueTypes.length > 0) {
+            setSelectedRoomType(uniqueTypes[0].roomType.typeKey);
+            setSelectedRoomId(uniqueTypes[0].id);
+          }
         }
         setLoading(false);
       })
@@ -81,7 +103,7 @@ export default function BookingPage() {
         console.error('Error fetching rooms:', err);
         setLoading(false);
       });
-  }, []);
+  }, [searchParams]);
 
   // Fetch booked dates for selected room type
   useEffect(() => {
@@ -238,124 +260,140 @@ export default function BookingPage() {
       <BookingTimeline currentStep={1} />
       
       {/* Room Selection and Details Section */}
-      <div className="bg-stone-100 border-b border-stone-200 pt-4 pb-4">
-        <div className="container mx-auto px-6 py-6">
+      <div className="bg-stone-100 border-b border-stone-200 pt-3 pb-3">
+        <div className="container mx-auto px-6 py-3">
           <div className={`${language === "ar" ? "text-right" : "text-left"}`}>
             {/* Page Title */}
-            <h1 className={`text-2xl font-bold text-stone-800 mb-4 text-center font-playfair ${language === "ar" ? "font-cairo" : ""}`}>
+            <h1 className={`text-2xl font-bold text-stone-800 mb-3 text-center font-playfair ${language === "ar" ? "font-cairo" : ""}`}>
               {language === "ar" ? "اختر التاريخ ونوع الغرفة" : "Select Date & Room Type"}
             </h1>
             
-            <div className={`grid md:grid-cols-3 gap-4 mb-4`}>
-              {/* Room Selection */}
-              <div className="md:col-span-2">
-                <label className={`block text-lg font-semibold text-stone-800 mb-2 ${language === "ar" ? "text-right" : "text-left"}`}>
-                  {t("selectRoom")}
-                </label>
-                <select
-                  value={selectedRoomType || ""}
-                  onChange={(e) => {
-                    const typeKey = e.target.value;
-                    setSelectedRoomType(typeKey);
-                    // Find a room of this type (prefer available, otherwise any room of this type)
-                    const typeRoom = availableRooms.find(r => r.roomType.typeKey === typeKey) 
-                      || rooms.find(r => r.roomType.typeKey === typeKey);
-                    if (typeRoom) {
-                      setSelectedRoomId(typeRoom.id);
-                    }
-                  }}
-                  disabled={checkingAvailability}
-                  className={`w-full px-4 py-3 border border-stone-300 rounded-lg text-lg text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-500 ${language === "ar" ? "text-right" : "text-left"} ${checkingAvailability ? "opacity-50 cursor-not-allowed" : ""}`}
-                  style={{ fontSize: '18px' }}
-                >
-                  {checkingAvailability ? (
-                    <option value="" style={{ fontSize: '18px' }}>{language === "ar" ? "جاري التحقق من التوفر..." : "Checking availability..."}</option>
-                  ) : roomTypes.length === 0 ? (
-                    <option value="" style={{ fontSize: '18px' }}>{language === "ar" ? "لا توجد غرف" : "No rooms"}</option>
-                  ) : (
-                    roomTypes.map((room) => {
-                      const typeKey = room.roomType.typeKey;
-                      const roomTypeAvailability = availability[typeKey];
-                      const isAvailable = roomTypeAvailability && roomTypeAvailability.available > 0;
-                      const availabilityText = roomTypeAvailability 
-                        ? `(${roomTypeAvailability.available}/${roomTypeAvailability.total} ${language === "ar" ? "متاح" : "available"})`
-                        : selectedDates.length === 2
-                        ? `(${language === "ar" ? "غير متاح" : "not available"})`
-                        : "";
-                      return (
-                        <option key={typeKey} value={typeKey} disabled={selectedDates.length === 2 && !isAvailable} style={{ fontSize: '18px' }}>
-                          {t(typeKey as keyof typeof import("@/lib/translations").translations.ar)} - {formatPrice(room.roomType.price)} / {t("perNight")} {availabilityText}
-                        </option>
-                      );
-                    })
-                  )}
-                </select>
-              </div>
-
-              {/* Currency Selection */}
-              <div>
-                <label className={`block text-base font-semibold text-stone-800 mb-2 ${language === "ar" ? "text-right" : "text-left"}`}>
-                  {t("localCurrency")}
-                </label>
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value as Currency)}
-                  className={`w-full px-4 py-3 border border-stone-300 rounded-lg text-base text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-500 ${language === "ar" ? "text-right" : "text-left"}`}
-                  style={{ fontSize: '16px' }}
-                >
-                  <option value="USD">{t("dollar")} (USD)</option>
-                  <option value="EUR">{t("euro")} (EUR)</option>
-                  <option value="SYP">{t("syrianPound")} (SYP)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Room Details */}
-            {selectedRoom && (
-              <div className="p-4 bg-stone-50 rounded-lg">
-                <div className="grid md:grid-cols-3 gap-4 mb-2">
-                  <div>
-                    <span className="text-xl font-semibold text-stone-600">{t("price")}: </span>
-                    <span className="text-xl font-bold text-stone-800">{formatPrice(selectedRoom.roomType.price)} / {t("perNight")}</span>
-                  </div>
-                  <div>
-                    <span className="text-xl font-semibold text-stone-600">{t("roomGuests")}: </span>
-                    <span className="text-xl font-semibold text-stone-800">{selectedRoom.roomType.guests}</span>
-                  </div>
-                  <div>
-                    <span className="text-xl font-semibold text-stone-600">{t("roomSize")}: </span>
-                    <span className="text-xl font-semibold text-stone-800">{selectedRoom.roomType.size} {t("squareMeters")}</span>
-                  </div>
+            <div className="mb-3">
+              {/* Room Selection and Details */}
+              <div className={`flex items-end gap-4 flex-wrap ${language === "ar" ? "" : ""}`}>
+                {/* Room Selection - Smaller - Left Side */}
+                <div className="min-w-[180px] max-w-[220px]">
+                  <label className={`block text-base font-semibold text-stone-800 mb-2 ${language === "ar" ? "text-right" : "text-left"}`}>
+                    {t("selectRoom")}
+                  </label>
+                  <select
+                    value={selectedRoomType || ""}
+                    onChange={(e) => {
+                      const typeKey = e.target.value;
+                      setSelectedRoomType(typeKey);
+                      setCurrentImageIndex(0); // Reset image index when changing room type
+                      // Find a room of this type (prefer available, otherwise any room of this type)
+                      const typeRoom = availableRooms.find(r => r.roomType.typeKey === typeKey) 
+                        || rooms.find(r => r.roomType.typeKey === typeKey);
+                      if (typeRoom) {
+                        setSelectedRoomId(typeRoom.id);
+                      }
+                    }}
+                    disabled={checkingAvailability}
+                    className={`w-full px-3 py-2 border border-stone-300 rounded-lg text-base text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-stone-500 ${language === "ar" ? "text-right" : "text-left"} ${checkingAvailability ? "opacity-50 cursor-not-allowed" : ""}`}
+                    style={{ fontSize: '16px' }}
+                  >
+                    {checkingAvailability ? (
+                      <option value="" style={{ fontSize: '16px' }}>{language === "ar" ? "جاري التحقق من التوفر..." : "Checking availability..."}</option>
+                    ) : roomTypes.length === 0 ? (
+                      <option value="" style={{ fontSize: '16px' }}>{language === "ar" ? "لا توجد غرف" : "No rooms"}</option>
+                    ) : (
+                      roomTypes.map((room) => {
+                        const typeKey = room.roomType.typeKey;
+                        const roomTypeAvailability = availability[typeKey];
+                        const isAvailable = roomTypeAvailability && roomTypeAvailability.available > 0;
+                        return (
+                          <option key={typeKey} value={typeKey} disabled={selectedDates.length === 2 && !isAvailable} style={{ fontSize: '16px' }}>
+                            {t(typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                          </option>
+                        );
+                      })
+                    )}
+                  </select>
                 </div>
-                {selectedDates.length === 2 && selectedRoomType && availability[selectedRoomType] && (
-                  <div className={`text-base ${availability[selectedRoomType].available > 0 ? "text-green-700" : "text-red-700"} ${language === "ar" ? "text-right" : "text-left"}`}>
-                    {language === "ar" 
-                      ? `${availability[selectedRoomType].available} من ${availability[selectedRoomType].total} غرف متاحة`
-                      : `${availability[selectedRoomType].available} of ${availability[selectedRoomType].total} rooms available`}
+
+                {/* Room Details - Right Side of Room Selection */}
+                {selectedRoom && (
+                  <div className="flex-1 p-3 bg-stone-50 rounded-lg">
+                    <div className="grid md:grid-cols-3 gap-3">
+                      <div>
+                        <span className="text-base font-semibold text-stone-600">{t("price")}: </span>
+                        <span className="text-base font-bold text-stone-800">{formatPrice(selectedRoom.roomType.price)} / {t("perNight")}</span>
+                      </div>
+                      <div>
+                        <span className="text-base font-semibold text-stone-600">{t("roomGuests")}: </span>
+                        <span className="text-base font-semibold text-stone-800">{selectedRoom.roomType.guests}</span>
+                      </div>
+                      <div>
+                        <span className="text-base font-semibold text-stone-600">{t("roomSize")}: </span>
+                        <span className="text-base font-semibold text-stone-800">{selectedRoom.roomType.size} {t("squareMeters")}</span>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Calendar Section */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 pt-4 pb-12">
         <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${language === "ar" ? "lg:grid-flow-col-dense" : ""}`}>
           {/* Room Image - Left Side (1/3 max) */}
-          {selectedRoom && (
-            <div className={`lg:col-span-1 ${language === "ar" ? "lg:col-start-3" : ""}`}>
-              <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src={`/images/rooms/primary-${selectedRoom.roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`}
-                  alt={t(selectedRoom.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
-                  fill
-                  className="object-cover"
-                />
+          {selectedRoom && (() => {
+            // Define images for each room type (2 images per type)
+            const roomImages: { [key: string]: string[] } = {
+              'roomType1': ['/images/rooms/primary-deluxe-room.jpg', '/images/rooms/additional-1-deluxe-room.jpg'],
+              'roomType2': ['/images/rooms/primary-luxury-suite.jpg', '/images/rooms/additional-1-luxury-suite.jpg'],
+              'roomType3': ['/images/rooms/primary-presidential-suite.jpg', '/images/rooms/additional-1-presidential-suite.jpg'],
+              'roomType4': ['/images/rooms/primary-family-room.jpg', '/images/rooms/additional-1-family-room.jpg'],
+              'roomType5': ['/images/rooms/primary-honeymoon-suite.jpg', '/images/rooms/additional-1-honeymoon-suite.jpg'],
+            };
+            
+            const images = roomImages[selectedRoom.roomType.typeKey] || [
+              `/images/rooms/primary-${selectedRoom.roomType.typeKey.replace('roomType', '').toLowerCase().replace('1', 'deluxe-room').replace('2', 'luxury-suite').replace('3', 'presidential-suite').replace('4', 'family-room').replace('5', 'honeymoon-suite')}.jpg`
+            ];
+            
+            return (
+              <div className={`lg:col-span-1 ${language === "ar" ? "lg:col-start-3" : ""}`}>
+                <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg mb-4">
+                  <Image
+                    src={images[currentImageIndex] || images[0]}
+                    alt={t(selectedRoom.roomType.typeKey as keyof typeof import("@/lib/translations").translations.ar)}
+                    fill
+                    className="object-cover"
+                  />
+                  
+                  {/* Navigation Dots */}
+                  {images.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full">
+                      {images.map((_, imgIndex) => (
+                        <button
+                          key={imgIndex}
+                          onClick={() => setCurrentImageIndex(imgIndex)}
+                          className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                            currentImageIndex === imgIndex 
+                              ? "bg-stone-800" 
+                              : "bg-stone-500 hover:bg-stone-600"
+                          }`}
+                          aria-label={`Go to image ${imgIndex + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Button for more room details */}
+                <Link
+                  href={`/rooms?roomTypeId=${selectedRoom.roomType.id}`}
+                  className="w-full bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors whitespace-nowrap text-center block"
+                >
+                  {language === "ar" ? "للمزيد من المعلومات عن الغرفة انقر هنا" : "For more information about the room, click here"}
+                </Link>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Calendar - Right Side (2/3) */}
           <div className={`lg:col-span-2 ${language === "ar" && selectedRoom ? "lg:col-start-1" : ""}`}>
@@ -416,17 +454,25 @@ export default function BookingPage() {
 
             {/* Right: Legend */}
             <div className={`flex items-center gap-6 flex-wrap ${language === "ar" ? "flex-row-reverse" : ""}`}>
+              {/* Currency Selection */}
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                className={`px-2 py-1 border border-stone-300 rounded text-xs text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-stone-500 ${language === "ar" ? "text-right" : "text-left"}`}
+                style={{ fontSize: '12px' }}
+              >
+                <option value="USD">{t("dollar")}</option>
+                <option value="EUR">{t("euro")}</option>
+                <option value="SYP">{t("syrianPound")}</option>
+              </select>
+              
               <div className={`flex items-center gap-2 ${language === "ar" ? "flex-row-reverse" : ""}`}>
-                <div className="w-4 h-4 bg-white border border-stone-300 rounded flex-shrink-0"></div>
+                <div className="w-4 h-4 bg-stone-100 rounded flex-shrink-0"></div>
                 <span className="text-xs text-stone-600 whitespace-nowrap">{t("available")}</span>
               </div>
               <div className={`flex items-center gap-2 ${language === "ar" ? "flex-row-reverse" : ""}`}>
                 <div className="w-4 h-4 bg-gray-800 rounded flex-shrink-0"></div>
                 <span className="text-xs text-stone-600 whitespace-nowrap">{t("selectedDates")}</span>
-              </div>
-              <div className={`flex items-center gap-2 ${language === "ar" ? "flex-row-reverse" : ""}`}>
-                <div className="w-4 h-4 bg-stone-300 rounded flex-shrink-0"></div>
-                <span className="text-xs text-stone-600 whitespace-nowrap">{t("restrictionsApply")}</span>
               </div>
               <div className={`flex items-center gap-2 ${language === "ar" ? "flex-row-reverse" : ""}`}>
                 <svg className="w-4 h-4 text-stone-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

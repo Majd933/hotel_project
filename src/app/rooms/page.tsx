@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation, getFeatureTranslation } from "@/lib/translations";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -20,24 +21,44 @@ interface RoomType {
 
 export default function RoomsPage() {
   const { language } = useLanguage();
+  const searchParams = useSearchParams();
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({});
-  const roomRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  
+  // Ref لمنع التكرار وللتحكم في التمرير الأولي
+  const initialScrollDone = useRef(false);
 
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
     getTranslation(language, key);
 
+  // 1. جلب البيانات وتحديد الغرفة المختارة
   useEffect(() => {
     fetch('/api/room-types')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
           setRoomTypes(data);
-          // Set first room type as selected by default
-          if (data.length > 0) {
-            setSelectedRoomTypeId(data[0].id);
+          
+          const roomTypeIdParam = searchParams.get('roomTypeId');
+          
+          if (roomTypeIdParam) {
+            const roomTypeId = parseInt(roomTypeIdParam, 10);
+            const roomType = data.find(rt => rt.id === roomTypeId);
+            if (roomType) {
+              setSelectedRoomTypeId(roomTypeId);
+              // ملاحظة: نترك initialScrollDone = false لكي نسمح بالتمرير
+            } else if (data.length > 0) {
+              setSelectedRoomTypeId(data[0].id);
+              initialScrollDone.current = true; // لا تمرر تلقائياً إذا الرابط خطأ
+            }
+          } else {
+            // إذا دخل الصفحة بدون باراميتر
+            if (data.length > 0) {
+              setSelectedRoomTypeId(data[0].id);
+            }
+            initialScrollDone.current = true; // لا تمرر تلقائياً
           }
         } else {
           console.error('Invalid data format:', data);
@@ -50,45 +71,88 @@ export default function RoomsPage() {
         setRoomTypes([]);
         setLoading(false);
       });
-  }, []);
+  }, [searchParams]);
 
-  const scrollToRoom = (roomTypeId: number) => {
-    setSelectedRoomTypeId(roomTypeId);
-    const roomElement = roomRefs.current[roomTypeId];
-    if (roomElement) {
-      if (roomTypeId === roomTypes[0]?.id) {
-        // Scroll to top for first room type
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        roomElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // 2. منطق التمرير التلقائي عند فتح الصفحة (الحل الجديد)
+  useEffect(() => {
+    // الشرط: التحميل انتهى، البيانات موجودة، تم اختيار غرفة، ولم نمرر بعد
+    if (!loading && roomTypes.length > 0 && selectedRoomTypeId !== null && !initialScrollDone.current) {
+      
+      const targetId = `room-type-${selectedRoomTypeId}`;
+      const element = document.getElementById(targetId);
+
+      if (element) {
+        // تأخير بسيط جداً للسماح للصور والعناصر بأخذ حجمها
+        setTimeout(() => {
+          const headerHeight = 100; // ارتفاع الهيدر لديك
+          const rect = element.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const elementTop = rect.top + scrollTop;
+          const offsetPosition = elementTop - headerHeight;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+
+          // نضع علامة أننا انتهينا من التمرير الأولي
+          initialScrollDone.current = true;
+        }, 300);
       }
     }
+  }, [loading, roomTypes, selectedRoomTypeId]);
+
+
+  // 3. وظيفة التمرير اليدوي (عند الضغط على الأزرار)
+  const scrollToRoom = (roomTypeId: number) => {
+    setSelectedRoomTypeId(roomTypeId);
+    
+    // تأخير بسيط جداً لضمان تحديث الـ State قبل الحركة
+    requestAnimationFrame(() => {
+        const roomElement = document.getElementById(`room-type-${roomTypeId}`);
+        if (roomElement) {
+            const headerHeight = 100;
+            const elementRect = roomElement.getBoundingClientRect();
+            const elementPosition = elementRect.top + window.pageYOffset;
+            const offsetPosition = elementPosition - headerHeight;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    });
   };
 
-  // Update selectedRoomTypeId on scroll
+  // 4. تحديث الغرفة المختارة في القائمة الجانبية عند التمرير اليدوي للمستخدم
   useEffect(() => {
     const handleScroll = () => {
+      // إذا كان التمرير التلقائي لا يزال جارياً، لا تفعل شيئاً لتجنب التعارض
+      if (!initialScrollDone.current && searchParams.get('roomTypeId')) return;
+
       let currentSelectedId: number | null = null;
+      
       for (const roomType of roomTypes) {
-        const el = roomRefs.current[roomType.id];
+        const el = document.getElementById(`room-type-${roomType.id}`);
         if (el) {
           const rect = el.getBoundingClientRect();
-          // Consider a room type "selected" if its top is within the viewport and it's the closest to the top
+          // المنطق: إذا كانت الغرفة في منتصف الشاشة تقريباً
           if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
             currentSelectedId = roomType.id;
             break;
           }
         }
       }
+      
       if (currentSelectedId !== null && currentSelectedId !== selectedRoomTypeId) {
         setSelectedRoomTypeId(currentSelectedId);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Call once on mount
+    handleScroll(); // استدعاء أولي
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [roomTypes, selectedRoomTypeId]);
+  }, [roomTypes, selectedRoomTypeId, searchParams]);
 
   if (loading) {
     return (
@@ -100,6 +164,7 @@ export default function RoomsPage() {
     );
   }
 
+  // --- JSX (نفس التصميم الأصلي تماماً) ---
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Hero Section */}
@@ -162,9 +227,7 @@ export default function RoomsPage() {
             {roomTypes.map((roomType, index) => (
               <div
                 key={roomType.id}
-                ref={(el) => {
-                  if (el) roomRefs.current[roomType.id] = el;
-                }}
+                id={`room-type-${roomType.id}`}
                 className={`flex flex-col justify-center py-16`}
               >
                 <div className={`grid ${language === "ar" ? "grid-cols-1 lg:grid-cols-[1fr_400px]" : "grid-cols-1 lg:grid-cols-[1fr_400px]"} gap-8 items-start`}>
@@ -210,7 +273,7 @@ export default function RoomsPage() {
                                 className={`w-3 h-3 rounded-full transition-all duration-200 ${
                                   currentIndex === imgIndex 
                                     ? "bg-stone-800" 
-                                    : "bg-stone-300 hover:bg-stone-400"
+                                    : "bg-stone-500 hover:bg-stone-600"
                                 }`}
                                 aria-label={`Go to image ${imgIndex + 1}`}
                               />
@@ -281,7 +344,7 @@ export default function RoomsPage() {
                         </span>
                       </div>
                       <Link
-                        href="/booking"
+                        href={`/booking?roomTypeId=${roomType.id}`}
                         className="inline-block bg-stone-800 text-white px-8 py-3 rounded-lg font-light hover:bg-stone-700 transition-colors"
                       >
                         {t("bookNow")}

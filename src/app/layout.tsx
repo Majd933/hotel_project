@@ -4,6 +4,7 @@ import "./globals.css";
 import ConditionalHeader from "@/components/ConditionalHeader";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 // للعناوين - Headlines
 const playfairDisplay = Playfair_Display({
@@ -42,11 +43,13 @@ export default function RootLayout({
         className={`${playfairDisplay.variable} ${cairo.variable} ${ibmPlexSans.variable} antialiased flex flex-col min-h-screen`}
       >
         <LanguageProvider>
-          <ConditionalHeader />
-          <div className="flex-grow relative" style={{ marginTop: 0, paddingTop: 0 }}>
-            {children}
-          </div>
-          <Footer />
+          <CurrencyProvider>
+            <ConditionalHeader />
+            <div className="flex-grow relative" style={{ marginTop: 0, paddingTop: 0 }}>
+              {children}
+            </div>
+            <Footer />
+          </CurrencyProvider>
         </LanguageProvider>
       </body>
     </html>

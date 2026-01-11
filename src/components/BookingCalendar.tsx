@@ -131,11 +131,11 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
+                  relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
-                  ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-gray-900 text-white border-gray-900" : "text-stone-400 bg-stone-100 border-stone-300") : "text-stone-800 hover:bg-stone-100"}
-                  ${!booked && (selected || inRange) ? "bg-gray-800 font-semibold border-gray-800 group hover:bg-stone-200" : ""}
+                  ${past || booked ? "cursor-not-allowed" : (selected || inRange ? "cursor-pointer" : "")}
+                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-gray-900 text-white border-gray-900" : "text-stone-400 bg-stone-100 border-stone-300") : (selected || inRange ? "" : "text-stone-800 bg-stone-100 hover:bg-stone-200")}
+                  ${!booked && (selected || inRange) ? "bg-gray-800 font-semibold border-gray-800 group hover:bg-gray-700" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
@@ -144,7 +144,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                     <div className={`text-base font-medium ${
                       booked && !past 
                         ? (selected || inRange ? "text-white" : "text-stone-600")
-                        : (selected || inRange ? "text-white group-hover:text-stone-800" : "")
+                        : (selected || inRange ? "text-white" : "")
                     }`}>
                       {date.getDate()}
                     </div>
@@ -198,11 +198,11 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded cursor-pointer transition-all border border-transparent
+                  relative min-h-[60px] p-2 flex flex-col items-center justify-center rounded transition-all border border-transparent
                   ${!date ? "cursor-default invisible" : ""}
-                  ${past || booked ? "cursor-not-allowed" : ""}
-                  ${past ? "text-stone-300" : booked ? (selected || inRange ? "bg-gray-800 text-white border-gray-800" : "text-stone-400 bg-stone-100 border-stone-300") : "text-stone-800 hover:bg-stone-100"}
-                  ${!booked && (selected || inRange) ? "bg-gray-800 text-white font-semibold border-gray-800" : ""}
+                  ${past || booked ? "cursor-not-allowed" : (selected || inRange ? "cursor-pointer" : "")}
+                  ${past ? "" : booked ? (selected || inRange ? "bg-gray-800 text-white border-gray-800 group hover:bg-gray-700" : "text-stone-400 bg-stone-100 border-stone-300") : (selected || inRange ? "" : "text-stone-800 bg-stone-100 hover:bg-stone-200")}
+                  ${!booked && (selected || inRange) ? "bg-gray-800 text-white font-semibold border-gray-800 group hover:bg-gray-700" : ""}
                 `}
                 title={booked ? `${t("soldOut")}, ${t("soldOutMessage")}` : undefined}
               >
@@ -211,7 +211,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                     <div className={`text-base font-medium ${
                       booked && !past 
                         ? (selected || inRange ? "text-white" : "text-stone-600")
-                        : (selected || inRange ? "text-white group-hover:text-stone-800" : "")
+                        : (selected || inRange ? "text-white" : "")
                     }`}>
                       {date.getDate()}
                     </div>
