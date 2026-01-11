@@ -45,6 +45,16 @@ function BookingPageContent() {
   const t = (key: keyof typeof import("@/lib/translations").translations.ar) =>
     getTranslation(language, key);
 
+  // Convert numbers to Arabic-Indic numerals in Arabic
+  const formatNumber = (num: number | string): string => {
+    if (language === "ar") {
+      const arabicIndic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+      const numStr = num.toString();
+      return numStr.replace(/\d/g, (digit) => arabicIndic[parseInt(digit)]);
+    }
+    return num.toString();
+  };
+
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomTypes, setRoomTypes] = useState<Room[]>([]); // One room per type
@@ -223,15 +233,19 @@ function BookingPageContent() {
 
   const formatPrice = (price: number): string => {
     const convertedPrice = convertPrice(price);
+    const formattedNumber = language === "ar" 
+      ? formatNumber(convertedPrice.toLocaleString())
+      : convertedPrice.toLocaleString();
+    
     switch (currency) {
       case "SYP":
-        return `${convertedPrice.toLocaleString()} ${t("syrianPound")}`;
+        return `${formattedNumber} ${t("syrianPound")}`;
       case "USD":
-        return `$${convertedPrice.toLocaleString()} ${t("dollar")}`;
+        return `$${formattedNumber} ${t("dollar")}`;
       case "EUR":
-        return `€${convertedPrice.toLocaleString()} ${t("euro")}`;
+        return `€${formattedNumber} ${t("euro")}`;
       default:
-        return `$${convertedPrice.toLocaleString()}`;
+        return `$${formattedNumber}`;
     }
   };
 
@@ -322,11 +336,11 @@ function BookingPageContent() {
                       </div>
                       <div>
                         <span className="text-base font-semibold text-stone-600">{t("roomGuests")}: </span>
-                        <span className="text-base font-semibold text-stone-800">{selectedRoom.roomType.guests}</span>
+                        <span className="text-base font-semibold text-stone-800">{formatNumber(selectedRoom.roomType.guests)}</span>
                       </div>
                       <div>
                         <span className="text-base font-semibold text-stone-600">{t("roomSize")}: </span>
-                        <span className="text-base font-semibold text-stone-800">{selectedRoom.roomType.size} {t("squareMeters")}</span>
+                        <span className="text-base font-semibold text-stone-800">{formatNumber(selectedRoom.roomType.size)} {t("squareMeters")}</span>
                       </div>
                     </div>
                   </div>
