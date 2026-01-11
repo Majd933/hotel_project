@@ -17,6 +17,16 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
+  // Convert numbers to Arabic-Indic numerals in Arabic
+  const formatNumber = (num: number | string): string => {
+    if (language === "ar") {
+      const arabicIndic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+      const numStr = num.toString();
+      return numStr.replace(/\d/g, (digit) => arabicIndic[parseInt(digit)]);
+    }
+    return num.toString();
+  };
+
   // Generate dates for a month
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -50,7 +60,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
     const months = language === "ar" 
       ? ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"]
       : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    return `${months[date.getMonth()]} ${date.getFullYear()}`;
+    return `${months[date.getMonth()]} ${formatNumber(date.getFullYear())}`;
   };
 
   const weekDays = language === "ar"
@@ -104,7 +114,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
   const days2 = getDaysInMonth(nextMonthDate);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+    <div className={`flex flex-col lg:flex-row gap-8 lg:gap-12 ${language === "ar" ? "flex-row-reverse" : ""}`}>
       {/* First Month */}
       <div className="w-full lg:w-1/2">
         <div className="mb-4">
@@ -141,12 +151,12 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
               >
                 {date && (
                   <>
-                    <div className={`text-base font-medium ${
+                    <div className={`text-lg font-medium ${
                       booked && !past 
                         ? (selected || inRange ? "text-white" : "text-stone-600")
                         : (selected || inRange ? "text-white" : "")
                     }`}>
-                      {date.getDate()}
+                      {formatNumber(date.getDate())}
                     </div>
                     {booked && !past && (
                       <svg 
@@ -154,7 +164,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 100 100"
-                        strokeWidth={1}
+                        strokeWidth={2.5}
                         preserveAspectRatio="none"
                       >
                         <path 
@@ -208,12 +218,12 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
               >
                 {date && (
                   <>
-                    <div className={`text-base font-medium ${
+                    <div className={`text-lg font-medium ${
                       booked && !past 
                         ? (selected || inRange ? "text-white" : "text-stone-600")
                         : (selected || inRange ? "text-white" : "")
                     }`}>
-                      {date.getDate()}
+                      {formatNumber(date.getDate())}
                     </div>
                     {booked && !past && (
                       <svg 
@@ -221,7 +231,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 100 100"
-                        strokeWidth={1}
+                        strokeWidth={2.5}
                         preserveAspectRatio="none"
                       >
                         <path 
