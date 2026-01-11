@@ -186,7 +186,7 @@ export default function HomePage() {
             <div className={`${language === "ar" ? "md:order-2" : "md:order-1"}`}>
               <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-lg">
                 <Image
-                  src="/images/resturant.jpg"
+                  src="/images/home-resturant.jpg"
                   alt="Restaurant"
                   fill
                   className="object-cover"
@@ -250,7 +250,7 @@ export default function HomePage() {
             <div className={`${language === "ar" ? "md:order-1" : "md:order-2"}`}>
               <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-lg">
                 <Image
-                  src="/images/entertainment_facilities.jpg"
+                  src="/images/home-entertainment_facilities.jpg"
                   alt="Entertainment Facilities"
                   fill
                   className="object-cover"
