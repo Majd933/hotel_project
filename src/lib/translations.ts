@@ -26,6 +26,25 @@ export const translations = {
     startBooking: "ابدأ الحجز",
     clickForMore: "انقر للمزيد",
     
+    // New Home Sections
+    aboutHotelTitle: "عن الفندق",
+    aboutHotelDescription: "يقع فندقنا في قلب المدينة، حيث يلتقي الفخامة بالتراث الأصيل. نقدم لضيوفنا تجربة إقامة استثنائية مع خدمات راقية ومرافق حديثة.",
+    hotelEmail: "info@hotel.com",
+    hotelAddress: "شارع الاستقلال، دمشق، سوريا",
+    discoverMore: "اكتشف المزيد",
+    
+    roomsSectionTitle: "الغرف والأجنحة",
+    roomsSectionDescription: "اختر من بين مجموعتنا المتنوعة من الغرف الفاخرة والأجنحة الراقية. كل غرفة مصممة بعناية لتوفر أقصى درجات الراحة والأناقة.",
+    viewRooms: "عرض الغرف",
+    
+    restaurantsSectionTitle: "المطاعم والحانات",
+    restaurantsSectionDescription: "استمتع بأفضل الأطباق من أشهر المطابخ العالمية في مطاعمنا الراقية. نقدم تجربة طعام استثنائية مع أجواء راقية.",
+    viewRestaurants: "عرض المطاعم",
+    
+    entertainmentSectionTitle: "المرافق الترفيهية",
+    entertainmentSectionDescription: "استرخ واستمتع بمرافقنا الترفيهية المميزة. من الحمامات الساخنة والسبا إلى صالات الألعاب والأنشطة الترفيهية.",
+    viewFacilities: "عرض المرافق",
+    
     // Footer
     footerDescription: "استمتع بإقامة فاخرة وخدمة استثنائية في قلب المدينة",
     quickLinks: "روابط سريعة",
@@ -153,6 +172,25 @@ export const translations = {
     bookYourStayDesc: "Enjoy special offers and exceptional service",
     startBooking: "Start Booking",
     clickForMore: "Click for more",
+    
+    // New Home Sections
+    aboutHotelTitle: "About the Hotel",
+    aboutHotelDescription: "Located in the heart of the city, where luxury meets authentic heritage. We offer our guests an exceptional stay experience with elegant services and modern facilities.",
+    hotelEmail: "info@hotel.com",
+    hotelAddress: "Independence Street, Damascus, Syria",
+    discoverMore: "Discover More",
+    
+    roomsSectionTitle: "Rooms & Suites",
+    roomsSectionDescription: "Choose from our diverse collection of luxury rooms and elegant suites. Each room is carefully designed to provide maximum comfort and elegance.",
+    viewRooms: "View Rooms",
+    
+    restaurantsSectionTitle: "Restaurants & Bars",
+    restaurantsSectionDescription: "Enjoy the finest dishes from the world's most famous cuisines in our elegant restaurants. We offer an exceptional dining experience with sophisticated atmosphere.",
+    viewRestaurants: "View Restaurants",
+    
+    entertainmentSectionTitle: "Entertainment Facilities",
+    entertainmentSectionDescription: "Relax and enjoy our distinguished entertainment facilities. From hot tubs and spa to game rooms and recreational activities.",
+    viewFacilities: "View Facilities",
     
     // Footer
     footerDescription: "Enjoy a luxurious stay and exceptional service in the heart of the city",
