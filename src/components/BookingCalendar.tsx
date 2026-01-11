@@ -104,7 +104,7 @@ export default function BookingCalendar({ onDateSelect, selectedDates = [], book
   const days2 = getDaysInMonth(nextMonthDate);
 
   return (
-    <div className={`flex flex-col lg:flex-row gap-8 lg:gap-12 ${language === "ar" ? "flex-row-reverse" : ""}`}>
+    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
       {/* First Month */}
       <div className="w-full lg:w-1/2">
         <div className="mb-4">
