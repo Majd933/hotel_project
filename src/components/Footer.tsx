@@ -57,6 +57,22 @@ export default function Footer() {
                   {t("about")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/restaurants"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  {t("restaurants")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/facilities"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  {t("facilities")}
+                </Link>
+              </li>
             </ul>
           </div>
 

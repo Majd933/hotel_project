@@ -170,6 +170,28 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                     {t("about")}
                   </Link>
                   <Link
+                    href="/restaurants"
+                    onClick={() => setIsPagesDropdownOpen(false)}
+                    className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
+                      isScrolled 
+                        ? "text-stone-800 hover:bg-stone-100" 
+                        : "text-white hover:bg-white/20"
+                    }`}
+                  >
+                    {t("restaurants")}
+                  </Link>
+                  <Link
+                    href="/facilities"
+                    onClick={() => setIsPagesDropdownOpen(false)}
+                    className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
+                      isScrolled 
+                        ? "text-stone-800 hover:bg-stone-100" 
+                        : "text-white hover:bg-white/20"
+                    }`}
+                  >
+                    {t("facilities")}
+                  </Link>
+                  <Link
                     href="/contact"
                     onClick={() => setIsPagesDropdownOpen(false)}
                     className={`block w-full px-5 py-3 transition-colors text-lg ${language === "ar" ? "text-right" : "text-left"} ${
@@ -259,6 +281,28 @@ export default function Header({ hideBookButton = false, forceDarkText = false }
                         }`}
                       >
                         {t("about")}
+                      </Link>
+                      <Link
+                        href="/restaurants"
+                        onClick={() => setIsPagesDropdownOpen(false)}
+                        className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
+                          isScrolled 
+                            ? "text-stone-800 hover:bg-stone-100" 
+                            : "text-white hover:bg-white/20"
+                        }`}
+                      >
+                        {t("restaurants")}
+                      </Link>
+                      <Link
+                        href="/facilities"
+                        onClick={() => setIsPagesDropdownOpen(false)}
+                        className={`block w-full text-left px-5 py-3 transition-colors text-lg ${
+                          isScrolled 
+                            ? "text-stone-800 hover:bg-stone-100" 
+                            : "text-white hover:bg-white/20"
+                        }`}
+                      >
+                        {t("facilities")}
                       </Link>
                       <Link
                         href="/contact"

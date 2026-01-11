@@ -170,7 +170,7 @@ export default function HomePage() {
           <div className={`max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center ${language === "ar" ? "grid-flow-col-dense" : ""}`}>
             {/* Image - Left side (or right in Arabic) */}
             <div className={`${language === "ar" ? "md:order-2" : "md:order-1"}`}>
-              <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-lg">
+              <div className="relative w-full h-96 md:h-[500px] rounded-lg overflow-hidden shadow-lg">
                 <Image
                   src="/images/home-resturant.jpg"
                   alt="Restaurant"
@@ -234,7 +234,7 @@ export default function HomePage() {
             
             {/* Image - Right side (or left in Arabic) */}
             <div className={`${language === "ar" ? "md:order-1" : "md:order-2"}`}>
-              <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-lg">
+              <div className="relative w-full h-96 md:h-[500px] rounded-lg overflow-hidden shadow-lg">
                 <Image
                   src="/images/home-entertainment_facilities.jpg"
                   alt="Entertainment Facilities"

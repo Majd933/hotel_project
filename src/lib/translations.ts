@@ -7,6 +7,8 @@ export const translations = {
     booking: "الحجز",
     about: "من نحن",
     contact: "اتصل بنا",
+    restaurants: "المطاعم",
+    facilities: "المرافق",
     hotelName: "فندق الشيراتون",
     
     // Home Page
@@ -37,7 +39,7 @@ export const translations = {
     roomsSectionDescription: "اختر من بين مجموعتنا المتنوعة من الغرف الفاخرة والأجنحة الراقية. كل غرفة مصممة بعناية لتوفر أقصى درجات الراحة والأناقة.",
     viewRooms: "عرض الغرف",
     
-    restaurantsSectionTitle: "المطاعم والحانات",
+    restaurantsSectionTitle: "المطاعم",
     restaurantsSectionDescription: "استمتع بأفضل الأطباق من أشهر المطابخ العالمية في مطاعمنا الراقية. نقدم تجربة طعام استثنائية مع أجواء راقية.",
     viewRestaurants: "عرض المطاعم",
     
@@ -154,6 +156,8 @@ export const translations = {
     booking: "Booking",
     about: "About",
     contact: "Contact",
+    restaurants: "Restaurants",
+    facilities: "Facilities",
     hotelName: "Sheraton Hotel",
     
     // Home Page
@@ -184,7 +188,7 @@ export const translations = {
     roomsSectionDescription: "Choose from our diverse collection of luxury rooms and elegant suites. Each room is carefully designed to provide maximum comfort and elegance.",
     viewRooms: "View Rooms",
     
-    restaurantsSectionTitle: "Restaurants & Bars",
+    restaurantsSectionTitle: "Restaurants",
     restaurantsSectionDescription: "Enjoy the finest dishes from the world's most famous cuisines in our elegant restaurants. We offer an exceptional dining experience with sophisticated atmosphere.",
     viewRestaurants: "View Restaurants",
     
