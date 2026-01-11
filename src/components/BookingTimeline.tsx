@@ -33,9 +33,10 @@ export default function BookingTimeline({ currentStep }: BookingTimelineProps) {
             
             {/* FIX: The Track Container
                هذا العنصر يمثل المسافة الفعلية بين أول وآخر دائرة
-               وضعنا الخط الملون داخله لكي تكون النسبة المئوية دقيقة
+               مع Grid، الدوائر في المنتصف من كل عمود (10%, 30%, 50%, 70%, 90%)
+               الخط يبدأ من مركز أول دائرة (10%) وينتهي في مركز آخر دائرة (90%)
             */}
-            <div className="absolute top-6 left-6 right-6 h-0.5 bg-stone-200 -z-0">
+            <div className="absolute top-6 left-[10%] right-[10%] h-0.5 bg-stone-200 -z-0">
               {/* Active Progress Line */}
               <div 
                 className={`absolute top-0 h-full bg-stone-800 transition-all duration-500 ease-out`}
@@ -48,7 +49,7 @@ export default function BookingTimeline({ currentStep }: BookingTimelineProps) {
             </div>
             
             {/* Steps Circles */}
-            <div className="flex justify-between items-start w-full relative z-10">
+            <div className="grid grid-cols-5 items-start w-full relative z-10 gap-0">
               {steps.map((step) => {
                 const isActive = currentStep >= step.number;
                 const isCurrent = currentStep === step.number;
@@ -67,10 +68,10 @@ export default function BookingTimeline({ currentStep }: BookingTimelineProps) {
                     </div>
                     
                     {/* Step Label */}
-                    <div className={`mt-3 text-xs font-bold text-center whitespace-nowrap px-1 ${language === "ar" ? "font-cairo" : ""} ${
+                    <div className={`mt-3 text-xs md:text-sm font-bold text-center px-1 ${language === "ar" ? "font-cairo" : ""} ${
                       isActive ? "text-stone-800" : "text-stone-400"
                     }`}>
-                      {t(step.key as keyof typeof import("@/lib/translations").translations.ar)}
+                      <span className="block leading-tight">{t(step.key as keyof typeof import("@/lib/translations").translations.ar)}</span>
                     </div>
                   </div>
                 );
